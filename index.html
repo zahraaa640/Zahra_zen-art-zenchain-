@@ -1,110 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>ZenArt – Powered by ZenChain</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        margin: 0;
-        font-family: sans-serif;
-        background-color: #111;
-        color: #fff;
-        text-align: center;
-        padding: 20px;
-      }
-      .logo {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #00ffcc, #ffcc00, #3399ff);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 20px;
-      }
-      .logo-symbol {
-        font-size: 40px;
-        color: black;
-      }
-      .connect-btn, .register-btn {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #222;
-        color: #fff;
-        border: 1px solid #555;
-        border-radius: 6px;
-        font-size: 16px;
-        cursor: pointer;
-      }
-      input, textarea {
-        width: 90%;
-        max-width: 400px;
-        margin: 10px auto;
-        padding: 10px;
-        border-radius: 6px;
-        border: none;
-        background-color: #222;
-        color: #fff;
-        font-size: 14px;
-        display: block;
-      }
-      .section {
-        margin-top: 40px;
-        text-align: left;
-        max-width: 500px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      h2 {
-        border-bottom: 1px solid #444;
-        padding-bottom: 5px;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="logo">
-      <div class="logo-symbol">⛩️</div>
-    </div>
-    <h1>ZenArt</h1>
-    <p>Welcome to ZenArt! Connect your MetaMask wallet to get started.</p>
-    <button class="connect-btn">🔗 Connect Wallet</button>
+<head>
+  <meta charset="UTF-8">
+  <title>ZenArt</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .section {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
 
-    <div class="section">
-      <h2>🎨 Register Artwork</h2>
-      <input type="text" placeholder="Artwork Title" id="title" />
-      <input type="text" placeholder="Artist Name" id="artist" />
-      <textarea placeholder="Description" id="description"></textarea>
-      <input type="text" placeholder="IPFS Image Hash (e.g. Qm...)" id="ipfs" />
-      <button class="register-btn">📝 Register</button>
-      <p style="margin-top:10px; font-size:13px; color:#aaa;">Connect wallet to register artwork or like.</p>
-    </div>
+  <h1>🎨 Welcome to ZenArt</h1>
+  <p>Empowering artists on the blockchain</p>
 
-    <div class="section">
-      <h2>🖼️ Gallery</h2>
-      <p style="color:#888;">Coming soon...</p>
-    </div>
+  <button class="connect-wallet">Connect Wallet</button>
 
-    <div class="section">
-      <h2>🔥 Most Popular Artworks</h2>
-      <p style="color:#888;">Coming soon...</p>
-    </div>
+  <div class="section">
+    <h2>🖼️ Gallery</h2>
+    <p style="color:#888;">Coming soon...</p>
+  </div>
 
-    <script>
-      async function connectWallet() {
-        if (window.ethereum) {
-          try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            alert('Wallet connected: ' + accounts[0]);
-          } catch (err) {
-            alert('Connection failed: ' + err.message);
-          }
-        } else {
-          alert('MetaMask not found. Please install it.');
+  <div class="section">
+    <h2>🔥 Most Popular Artists</h2>
+    <p style="color:#888;">Coming soon...</p>
+  </div>
+
+  <script>
+    async function connectWallet() {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const account = accounts[0];
+          console.log('Connected account:', account);
+          alert('Wallet connection successful!');
+        } catch (error) {
+          console.error('Wallet connection failed:', error);
+          alert('Wallet connection failed. Please try again.');
         }
+      } else {
+        alert('MetaMask not found. Please install it.');
       }
+    }
 
-      document.querySelector('.connect-btn').addEventListener('click', connectWallet);
-    </script>
-  </body>
+    document.querySelector('.connect-wallet').addEventListener('click', connectWallet);
+  </script>
+
+</body>
 </html>
