@@ -1,69 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>ZenArt</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZenArt Registry</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
       font-family: sans-serif;
-      background-color: #f9f9f9;
+      background-color: #f5f5f5;
       padding: 20px;
       text-align: center;
     }
+    input, button {
+      margin: 10px;
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+    }
     button {
-      padding: 10px 20px;
-      font-size: 16px;
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 5px;
       cursor: pointer;
     }
     button:hover {
       background-color: #45a049;
     }
-    .section {
-      margin-top: 30px;
-    }
   </style>
 </head>
 <body>
-
-  <h1>🎨 Welcome to ZenArt</h1>
-  <p>Empowering artists on the blockchain</p>
-
-  <button class="connect-wallet">Connect Wallet</button>
-
-  <div class="section">
-    <h2>🖼️ Gallery</h2>
-    <p style="color:#888;">Coming soon...</p>
-  </div>
-
-  <div class="section">
-    <h2>🔥 Most Popular Artists</h2>
-    <p style="color:#888;">Coming soon...</p>
-  </div>
+  <h2>ثبت اثر هنری در ZenArt</h2>
+  <form id="artForm">
+    <input type="text" id="title" placeholder="عنوان اثر" required><br>
+    <input type="text" id="description" placeholder="توضیحات اثر" required><br>
+    <button type="submit">ثبت در بلاک‌چین</button>
+  </form>
 
   <script>
-    async function connectWallet() {
-      if (typeof window.ethereum !== 'undefined') {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const account = accounts[0];
-          console.log('Connected account:', account);
-          alert('Wallet connection successful!');
-        } catch (error) {
-          console.error('Wallet connection failed:', error);
-          alert('Wallet connection failed. Please try again.');
-        }
-      } else {
-        alert('MetaMask not found. Please install it.');
+    const contractAddress = "0x372474F85518a7b68FED6a8e0A30C97DB563C9Da";
+    const contractABI = [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+          { "indexed": false, "internalType": "string", "name": "title", "type": "string" },
+          { "indexed": false, "internalType": "string", "name": "description", "type": "string" },
+          { "indexed": true, "internalType": "address", "name": "artist", "type": "address" }
+        ],
+        "name": "ArtworkRegistered",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          { "internalType": "string", "name": "_title", "type": "string" },
+          { "internalType": "string", "name": "_description", "type": "string" }
+        ],
+        "name": "registerArtwork",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
       }
-    }
+    ];
 
-    document.querySelector('.connect-wallet').addEventListener('click', connectWallet);
+    window.addEventListener('load', async () => {
+      if (window.ethereum) {
+        window.web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        const zenArtContract = new web3.eth.Contract(contractABI, contractAddress);
+        const userAddress = (await web3.eth.getAccounts())[0];
+
+        document.getElementById('artForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const title = document.getElementById('title').value;
+          const description = document.getElementById('description').value;
+
+          try {
+            await zenArtContract.methods.registerArtwork(title, description).send({ from: userAddress });
+            alert("✅ اثر با موفقیت ثبت شد!");
+            document.getElementById('artForm').reset();
+          } catch (err) {
+            console.error(err);
+            alert("❌ خطا در ثبت اثر. لطفاً MetaMask را بررسی کنید.");
+          }
+        });
+      } else {
+        alert("❌ MetaMask نصب نیست یا فعال نشده.");
+      }
+    });
   </script>
-
 </body>
 </html>
