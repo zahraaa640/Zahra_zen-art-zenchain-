@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>ZenArt</title>
+    <title>ZenArt – Powered by ZenChain</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       body {
@@ -46,5 +46,22 @@
     <h1>ZenArt</h1>
     <p>Welcome to ZenArt! Connect your MetaMask wallet to get started.</p>
     <button class="connect-btn">🔗 Connect Wallet</button>
+
+    <script>
+      async function connectWallet() {
+        if (window.ethereum) {
+          try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            alert('Wallet connected: ' + accounts[0]);
+          } catch (err) {
+            alert('Connection failed: ' + err.message);
+          }
+        } else {
+          alert('MetaMask not found. Please install it.');
+        }
+      }
+
+      document.querySelector('.connect-btn').addEventListener('click', connectWallet);
+    </script>
   </body>
 </html>
