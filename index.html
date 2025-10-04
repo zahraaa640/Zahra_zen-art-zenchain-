@@ -2,99 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ZenArt Registry</title>
+  <title>ZenArt</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
+      background: linear-gradient(to bottom right, #c8f7c5, #b3e5fc);
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding: 20px;
+      padding: 50px 20px;
     }
-    img.logo {
-      width: 150px;
+    .logo {
+      width: 120px;
       margin-bottom: 20px;
     }
-    .menu {
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 16px;
       margin-bottom: 30px;
     }
-    .menu button {
-      margin: 10px;
-      padding: 10px 20px;
+    button {
       font-size: 16px;
-      cursor: pointer;
-    }
-    form input, form button {
-      margin: 10px;
-      padding: 10px;
-      width: 80%;
-      max-width: 400px;
-    }
-    form button {
-      background-color: #4CAF50;
+      padding: 12px 24px;
+      background-color: #333;
       color: white;
       border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #555;
     }
   </style>
 </head>
 <body>
   <!-- ZenChain Logo -->
-  <img src="https://your-logo-url.com/zenchain.png" alt="ZenChain Logo" class="logo">
+  <img src="https://raw.githubusercontent.com/zahrasadeqi8/assets/main/zenchain-logo.png" alt="ZenChain Logo" class="logo">
 
-  <h2>Welcome to ZenArt</h2>
+  <h1>ZenArt</h1>
+  <p>Welcome to ZenArt! Connect your MetaMask wallet to get started.</p>
 
-  <!-- Main Menu -->
-  <div class="menu">
-    <button onclick="document.getElementById('artForm').scrollIntoView()">Register Artwork</button>
-    <button onclick="alert('Gallery coming soon')">View Gallery</button>
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <button onclick="alert('ZenArt is a blockchain art registry built on ZenChain')">About ZenArt</button>
-  </div>
-
-  <!-- Artwork Registration Form -->
-  <form id="artForm">
-    <h3>Register New Artwork</h3>
-    <input type="text" id="title" placeholder="Artwork Title" required><br>
-    <input type="text" id="description" placeholder="Artwork Description" required><br>
-    <button type="submit">Submit to Blockchain</button>
-  </form>
+  <button onclick="connectWallet()">🔗 Connect Wallet</button>
 
   <script>
-    const contractAddress = "0x372474F85518a7b68FED6a8e0A30C97DB563C9Da";
-    const contractABI = [ /* your ABI here */ ];
+    let userAddress = null;
 
     async function connectWallet() {
       if (window.ethereum) {
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-        alert("Wallet connected!");
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          userAddress = accounts[0];
+          alert("✅ Wallet connected: " + userAddress);
+        } catch (error) {
+          console.error(error);
+          alert("❌ Wallet connection failed.");
+        }
       } else {
-        alert("MetaMask not detected.");
+        alert("❌ MetaMask not detected. Please install MetaMask.");
       }
     }
 
-    window.addEventListener('load', async () => {
-      if (window.ethereum) {
-        window.web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        const zenArtContract = new web3.eth.Contract(contractABI, contractAddress);
-        const userAddress = (await web3.eth.getAccounts())[0];
-
-        document.getElementById('artForm').addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const title = document.getElementById('title').value;
-          const description = document.getElementById('description').value;
-
-          try {
-            await zenArtContract.methods.registerArtwork(title, description).send({ from: userAddress });
-            alert("Artwork successfully registered!");
-            document.getElementById('artForm').reset();
-          } catch (err) {
-            console.error(err);
-            alert("Error registering artwork.");
-          }
-        });
-      }
+    window.addEventListener('load', () => {
+      console.log("ZenArt loaded. Waiting for wallet connection.");
     });
   </script>
 </body>
