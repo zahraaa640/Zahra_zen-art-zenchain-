@@ -11,11 +11,11 @@
         background-color: #111;
         color: #fff;
         text-align: center;
-        padding: 40px;
+        padding: 20px;
       }
       .logo {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
         background: linear-gradient(135deg, #00ffcc, #ffcc00, #3399ff);
         display: flex;
@@ -24,18 +24,41 @@
         margin: 0 auto 20px;
       }
       .logo-symbol {
-        font-size: 48px;
+        font-size: 40px;
         color: black;
       }
-      .connect-btn {
-        margin-top: 30px;
-        padding: 12px 24px;
+      .connect-btn, .register-btn {
+        margin-top: 20px;
+        padding: 10px 20px;
         background-color: #222;
         color: #fff;
         border: 1px solid #555;
         border-radius: 6px;
         font-size: 16px;
         cursor: pointer;
+      }
+      input, textarea {
+        width: 90%;
+        max-width: 400px;
+        margin: 10px auto;
+        padding: 10px;
+        border-radius: 6px;
+        border: none;
+        background-color: #222;
+        color: #fff;
+        font-size: 14px;
+        display: block;
+      }
+      .section {
+        margin-top: 40px;
+        text-align: left;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      h2 {
+        border-bottom: 1px solid #444;
+        padding-bottom: 5px;
       }
     </style>
   </head>
@@ -46,6 +69,26 @@
     <h1>ZenArt</h1>
     <p>Welcome to ZenArt! Connect your MetaMask wallet to get started.</p>
     <button class="connect-btn">🔗 Connect Wallet</button>
+
+    <div class="section">
+      <h2>🎨 Register Artwork</h2>
+      <input type="text" placeholder="Artwork Title" id="title" />
+      <input type="text" placeholder="Artist Name" id="artist" />
+      <textarea placeholder="Description" id="description"></textarea>
+      <input type="text" placeholder="IPFS Image Hash (e.g. Qm...)" id="ipfs" />
+      <button class="register-btn">📝 Register</button>
+      <p style="margin-top:10px; font-size:13px; color:#aaa;">Connect wallet to register artwork or like.</p>
+    </div>
+
+    <div class="section">
+      <h2>🖼️ Gallery</h2>
+      <p style="color:#888;">Coming soon...</p>
+    </div>
+
+    <div class="section">
+      <h2>🔥 Most Popular Artworks</h2>
+      <p style="color:#888;">Coming soon...</p>
+    </div>
 
     <script>
       async function connectWallet() {
