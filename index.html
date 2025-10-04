@@ -1,71 +1,76 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>ZenArt Registry</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
   <style>
     body {
-      font-family: sans-serif;
-      background-color: #f5f5f5;
-      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
       text-align: center;
+      padding: 20px;
     }
-    input, button {
+    img.logo {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+    .menu {
+      margin-bottom: 30px;
+    }
+    .menu button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    form input, form button {
       margin: 10px;
       padding: 10px;
       width: 80%;
       max-width: 400px;
     }
-    button {
+    form button {
       background-color: #4CAF50;
       color: white;
       border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #45a049;
     }
   </style>
 </head>
 <body>
-  <h2>ثبت اثر هنری در ZenArt</h2>
+  <!-- ZenChain Logo -->
+  <img src="https://your-logo-url.com/zenchain.png" alt="ZenChain Logo" class="logo">
+
+  <h2>Welcome to ZenArt</h2>
+
+  <!-- Main Menu -->
+  <div class="menu">
+    <button onclick="document.getElementById('artForm').scrollIntoView()">Register Artwork</button>
+    <button onclick="alert('Gallery coming soon')">View Gallery</button>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <button onclick="alert('ZenArt is a blockchain art registry built on ZenChain')">About ZenArt</button>
+  </div>
+
+  <!-- Artwork Registration Form -->
   <form id="artForm">
-    <input type="text" id="title" placeholder="عنوان اثر" required><br>
-    <input type="text" id="description" placeholder="توضیحات اثر" required><br>
-    <button type="submit">ثبت در بلاک‌چین</button>
+    <h3>Register New Artwork</h3>
+    <input type="text" id="title" placeholder="Artwork Title" required><br>
+    <input type="text" id="description" placeholder="Artwork Description" required><br>
+    <button type="submit">Submit to Blockchain</button>
   </form>
 
   <script>
     const contractAddress = "0x372474F85518a7b68FED6a8e0A30C97DB563C9Da";
-    const contractABI = [
-      {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-          { "indexed": false, "internalType": "string", "name": "title", "type": "string" },
-          { "indexed": false, "internalType": "string", "name": "description", "type": "string" },
-          { "indexed": true, "internalType": "address", "name": "artist", "type": "address" }
-        ],
-        "name": "ArtworkRegistered",
-        "type": "event"
-      },
-      {
-        "inputs": [
-          { "internalType": "string", "name": "_title", "type": "string" },
-          { "internalType": "string", "name": "_description", "type": "string" }
-        ],
-        "name": "registerArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
+    const contractABI = [ /* your ABI here */ ];
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+        alert("Wallet connected!");
+      } else {
+        alert("MetaMask not detected.");
       }
-    ];
+    }
 
     window.addEventListener('load', async () => {
       if (window.ethereum) {
@@ -82,15 +87,13 @@
 
           try {
             await zenArtContract.methods.registerArtwork(title, description).send({ from: userAddress });
-            alert("✅ اثر با موفقیت ثبت شد!");
+            alert("Artwork successfully registered!");
             document.getElementById('artForm').reset();
           } catch (err) {
             console.error(err);
-            alert("❌ خطا در ثبت اثر. لطفاً MetaMask را بررسی کنید.");
+            alert("Error registering artwork.");
           }
         });
-      } else {
-        alert("❌ MetaMask نصب نیست یا فعال نشده.");
       }
     });
   </script>
