@@ -4,8 +4,47 @@
     <meta charset="UTF-8" />
     <title>ZenArt</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background-color: #111;
+        color: #fff;
+        text-align: center;
+        padding: 40px;
+      }
+      .logo {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #00ffcc, #ffcc00, #3399ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+      }
+      .logo-symbol {
+        font-size: 48px;
+        color: black;
+      }
+      .connect-btn {
+        margin-top: 30px;
+        padding: 12px 24px;
+        background-color: #222;
+        color: #fff;
+        border: 1px solid #555;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hello ZenArt</h1>
+    <div class="logo">
+      <div class="logo-symbol">⛩️</div>
+    </div>
+    <h1>ZenArt</h1>
+    <p>Welcome to ZenArt! Connect your MetaMask wallet to get started.</p>
+    <button class="connect-btn">🔗 Connect Wallet</button>
   </body>
 </html>
