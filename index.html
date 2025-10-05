@@ -2,79 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ZenArt – Powered by ZenChain</title>
+  <title>ZenArt – Tokenized Art Marketplace</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      background: linear-gradient(to bottom right, #c8f7c5, #b3e5fc);
+      background: linear-gradient(to bottom right, #e0f7fa, #fce4ec);
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 20px;
       text-align: center;
     }
-    .logo {
-      width: 140px;
-      margin: 20px auto;
-    }
+    h1 { font-size: 28px; margin-bottom: 10px; }
+    .logo { width: 140px; margin: 10px auto; }
     button.connect {
-      font-size: 16px;
-      padding: 12px 24px;
-      background-color: #333;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-bottom: 30px;
+      font-size: 16px; padding: 12px 24px;
+      background-color: #333; color: white;
+      border: none; border-radius: 6px;
+      cursor: pointer; margin-bottom: 30px;
     }
-    button.connect:hover {
-      background-color: #555;
-    }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-    p {
-      font-size: 16px;
-      margin-bottom: 30px;
-    }
-    form input {
-      padding: 10px;
-      margin: 8px;
-      width: 80%;
-      max-width: 400px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    form input, form button {
+      padding: 10px; margin: 8px;
+      width: 80%; max-width: 400px;
+      border-radius: 4px; border: 1px solid #ccc;
     }
     form button {
-      font-size: 16px;
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
+      background-color: #4CAF50; color: white; border: none;
     }
     .gallery {
-      margin-top: 40px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-top: 40px; max-width: 700px;
+      margin-left: auto; margin-right: auto;
       text-align: left;
     }
     .art-card {
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 15px;
-      margin-bottom: 15px;
+      background-color: #fff; border: 1px solid #ddd;
+      border-radius: 6px; padding: 15px; margin-bottom: 15px;
     }
-    .art-card h3 {
-      margin: 0 0 5px;
+    .art-card img {
+      max-width: 100%; border-radius: 6px; margin-top: 10px;
     }
-    .art-card p {
-      margin: 0;
-      font-size: 14px;
+    .chart-container {
+      margin-top: 50px; max-width: 600px;
+      margin-left: auto; margin-right: auto;
     }
   </style>
 </head>
@@ -82,14 +51,14 @@
   <button class="connect" onclick="connectWallet()">🔗 Connect Wallet</button>
   <img src="https://raw.githubusercontent.com/zahrasadeqi8/assets/main/zenchain-logo.png" alt="ZenChain Logo" class="logo">
   <h1>ZenArt</h1>
-  <p>Welcome to ZenArt! Connect your MetaMask wallet to register artwork or view gallery.</p>
+  <p>Register your artwork, interact with others, and explore the decentralized art gallery.</p>
 
   <form id="artForm">
     <h2>Register New Artwork</h2>
     <input type="text" id="title" placeholder="Artwork Title" required><br>
-    <input type="text" id="artist" placeholder="Artist Name (not stored)" required><br>
+    <input type="text" id="artistName" placeholder="Artist Name" required><br>
     <input type="text" id="description" placeholder="Description" required><br>
-    <input type="text" id="ipfsHash" placeholder="IPFS Image Hash (not stored)" required><br>
+    <input type="text" id="ipfsHash" placeholder="IPFS Image Hash" required><br>
     <button type="submit">Register</button>
   </form>
 
@@ -98,79 +67,202 @@
     <div id="artworks"></div>
   </div>
 
-  <script>
-    const contractAddress = "0x372474F85518a7b68FED6a8e0A30C97DB563C9Da";
-    const contractABI = [/* ABI you provided */];
+  <div class="chart-container">
+    <h2>📊 Popularity Chart</h2>
+    <canvas id="popularityChart"></canvas>
+  </div><script>
+const contractAddress = "0xD0AB46ccFDdd3DF6fDaae30Eb00ea39C904d38F3";
+const contractABI = [
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_title", "type": "string" },
+      { "internalType": "string", "name": "_artistName", "type": "string" },
+      { "internalType": "string", "name": "_description", "type": "string" },
+      { "internalType": "string", "name": "_ipfsHash", "type": "string" }
+    ],
+    "name": "registerArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_artworkId", "type": "uint256" }],
+    "name": "likeArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_artworkId", "type": "uint256" }],
+    "name": "signArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_artworkId", "type": "uint256" },
+      { "internalType": "address", "name": "_newOwner", "type": "address" }
+    ],
+    "name": "transferArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalArtworks",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "_artworkId", "type": "uint256" }],
+    "name": "getArtwork",
+    "outputs": [
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "artistName", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "ipfsHash", "type": "string" },
+      { "internalType": "address", "name": "currentOwner", "type": "address" },
+      { "internalType": "uint256", "name": "likes", "type": "uint256" },
+      { "internalType": "address[]", "name": "signers", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
-    let web3;
-    let zenArtContract;
-    let userAddress = null;
+let web3;
+let zenArtContract;
+let userAddress = null;
 
-    async function connectWallet() {
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          userAddress = accounts[0];
-          zenArtContract = new web3.eth.Contract(contractABI, contractAddress);
-          alert("✅ Wallet connected: " + userAddress);
-          loadArtworks();
-        } catch (error) {
-          console.error(error);
-          alert("❌ Wallet connection failed.");
-        }
-      } else {
-        alert("❌ MetaMask not detected. Please install MetaMask.");
-      }
+async function connectWallet() {
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      userAddress = accounts[0];
+      zenArtContract = new web3.eth.Contract(contractABI, contractAddress);
+      alert("✅ Wallet connected: " + userAddress);
+      loadArtworks();
+    } catch (error) {
+      alert("❌ Wallet connection failed.");
+    }
+  } else {
+    alert("❌ MetaMask not detected.");
+  }
+}
+
+document.getElementById('artForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('title').value;
+  const artistName = document.getElementById('artistName').value;
+  const description = document.getElementById('description').value;
+  const ipfsHash = document.getElementById('ipfsHash').value;
+
+  try {
+    await zenArtContract.methods.registerArtwork(title, artistName, description, ipfsHash).send({ from: userAddress });
+    alert("✅ Artwork registered.");
+    document.getElementById('artForm').reset();
+    loadArtworks();
+  } catch (error) {
+    alert("❌ Registration failed.");
+  }
+});
+
+async function loadArtworks() {
+  const container = document.getElementById('artworks');
+  container.innerHTML = "";
+  const labels = [];
+  const likeCounts = [];
+
+  try {
+    const total = await zenArtContract.methods.totalArtworks().call();
+    for (let i = 0; i < total; i++) {
+      const art = await zenArtContract.methods.getArtwork(i).call();
+      labels.push(art.title);
+      likeCounts.push(art.likes);
+
+      const card = document.createElement('div');
+      card.className = "art-card";
+      card.innerHTML = `
+        <h3>${art.title}</h3>
+        <p><strong>Artist:</strong> ${art.artistName}</p>
+        <p>${art.description}</p>
+        <img src="https://ipfs.io/ipfs/${art.ipfsHash}" alt="Artwork Image" />
+        <p><strong>Owner:</strong> ${art.currentOwner}</p>
+        <p><strong>Likes:</strong> ${art.likes}</p>
+        <p><strong>Signers:</strong> ${art.signers.length}</p>
+        <button onclick="likeArtwork(${i})">❤️ Like</button>
+        <button onclick="signArtwork(${i})">✍️ Sign</button>
+        <button onclick="transferArtwork(${i})">🔁 Transfer</button>
+      `;
+      container.appendChild(card);
     }
 
-    document.getElementById('artForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (!userAddress || !zenArtContract) {
-        alert("Please connect your wallet first.");
-        return;
-      }
+    renderChart(labels, likeCounts);
+  } catch (error) {
+    console.error("Error loading artworks:", error);
+  }
+}
 
-      const title = document.getElementById('title').value;
-      const description = document.getElementById('description').value;
+async function likeArtwork(id) {
+  try {
+    await zenArtContract.methods.likeArtwork(id).send({ from: userAddress });
+    alert("❤️ Liked!");
+    loadArtworks();
+  } catch (error) {
+    alert("❌ Like failed.");
+  }
+}
 
-      try {
-        await zenArtContract.methods.registerArtwork(title, description).send({ from: userAddress });
-        alert("✅ Artwork registered on blockchain.");
-        document.getElementById('artForm').reset();
-        loadArtworks();
-      } catch (error) {
-        console.error(error);
-        alert("❌ Registration failed.");
-      }
-    });
+async function signArtwork(id) {
+  try {
+    await zenArtContract.methods.signArtwork(id).send({ from: userAddress });
+    alert("✍️ Signed!");
+    loadArtworks();
+  } catch (error) {
+    alert("❌ Sign failed.");
+  }
+}
 
-    async function loadArtworks() {
-      if (!zenArtContract) return;
-      const container = document.getElementById('artworks');
-      container.innerHTML = "";
+async function transferArtwork(id) {
+  const to = prompt("Enter recipient address:");
+  if (!to) return;
+  try {
+    await zenArtContract.methods.transferArtwork(id, to).send({ from: userAddress });
+    alert("🔁 Transferred!");
+    loadArtworks();
+  } catch (error) {
+    alert("❌ Transfer failed.");
+  }
+}
 
-      try {
-        const total = await zenArtContract.methods.totalArtworks().call();
-        for (let i = 0; i < total; i++) {
-          const art = await zenArtContract.methods.getArtwork(i).call();
-          const card = document.createElement('div');
-          card.className = "art-card";
-          card.innerHTML = `
-            <h3>${art.title}</h3>
-            <p>${art.description}</p>
-            <p><strong>Artist:</strong> ${art.artist}</p>
-          `;
-          container.appendChild(card);
-        }
-      } catch (error) {
-        console.error("Error loading artworks:", error);
+function renderChart(labels, data) {
+  const ctx = document.getElementById('popularityChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Likes per Artwork',
+        data: data,
+        backgroundColor: '#4CAF50'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
       }
     }
+  });
+}
 
-    window.addEventListener('load', () => {
-      console.log("ZenArt loaded.");
-    });
-  </script>
+window.addEventListener('load', () => {
+  console.log("ZenArt loaded.");
+});
+</script>
 </body>
 </html>
