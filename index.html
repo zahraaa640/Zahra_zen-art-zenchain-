@@ -14,7 +14,11 @@
       text-align: center;
     }
     h1 { font-size: 28px; margin-bottom: 10px; }
-    .logo { width: 140px; margin: 10px auto; }
+    .logo {
+      width: 120px;
+      margin: 20px auto;
+      display: block;
+    }
     button.connect {
       font-size: 16px; padding: 12px 24px;
       background-color: #333; color: white;
@@ -49,9 +53,9 @@
 </head>
 <body>
   <button class="connect" onclick="connectWallet()">🔗 Connect Wallet</button>
-  <img src="https://raw.githubusercontent.com/zahrasadeqi8/assets/main/zenchain-logo.png" alt="ZenChain Logo" class="logo">
+  <img src="assets/zenchain-logo.png" alt="ZenChain Logo" class="logo">
   <h1>ZenArt</h1>
-  <p>Register your artwork, interact with others, and explore the decentralized art gallery.</p>
+  <p>Welcome to ZenArt! Connect your MetaMask wallet to get started.</p>
 
   <form id="artForm">
     <h2>Register New Artwork</h2>
@@ -162,11 +166,18 @@ document.getElementById('artForm').addEventListener('submit', async (e) => {
   const ipfsHash = document.getElementById('ipfsHash').value;
 
   try {
-    await zenArtContract.methods.registerArtwork(title, artistName, description, ipfsHash).send({ from: userAddress });
-    alert("✅ Artwork registered.");
-    document.getElementById('artForm').reset();
-    loadArtworks();
+    const receipt = await zenArtContract.methods.registerArtwork(title, artistName, description, ipfsHash)
+      .send({ from: userAddress });
+
+    if (receipt.status) {
+      alert("✅ Artwork registered.");
+      document.getElementById('artForm').reset();
+      setTimeout(loadArtworks, 2000);
+    } else {
+      alert("❌ Transaction failed.");
+    }
   } catch (error) {
+    console.error("Registration error:", error);
     alert("❌ Registration failed.");
   }
 });
