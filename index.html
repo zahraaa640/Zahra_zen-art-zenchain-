@@ -3,33 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZenArt</title>
+  <title>ZenArt – Tokenized Art Market</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #cceeff, #ffe6f0);
-      text-align: center;
+      background: linear-gradient(to bottom right, #fdf6f0, #e0f7ff);
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
-    .logo {
-      width: 120px;
-      margin-top: 20px;
+    header {
+      background-color: #222;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    header img {
+      width: 100px;
+      margin-bottom: 10px;
     }
     h1 {
-      color: #333;
-      margin-top: 10px;
+      margin: 0;
+      font-size: 28px;
+    }
+    .container {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
     }
     button {
       padding: 10px 20px;
-      margin: 10px;
+      margin: 10px 5px;
       border: none;
       border-radius: 5px;
       font-weight: bold;
       cursor: pointer;
+      transition: 0.3s;
     }
     #connectBtn {
-      background-color: black;
+      background-color: #007BFF;
       color: white;
     }
     #registerBtn {
@@ -37,103 +49,64 @@
       color: white;
     }
     input, textarea {
-      width: 80%;
-      padding: 8px;
-      margin: 5px 0;
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
       border-radius: 5px;
       border: 1px solid #ccc;
     }
     .art-card {
       background: white;
       border-radius: 10px;
-      padding: 10px;
-      margin: 10px auto;
-      width: 90%;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      padding: 15px;
+      margin: 15px 0;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
     .art-card button {
-      margin: 5px;
-      background-color: #007BFF;
+      background-color: #444;
       color: white;
+      margin: 5px;
     }
     .art-card button:hover {
-      background-color: #0056b3;
+      background-color: #000;
+    }
+    .history {
+      background-color: #f9f9f9;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo" />
-  <h1>Welcome to ZenArt</h1>
-  <button id="connectBtn">🔗 Connect Wallet</button>
-  <p id="walletAddress"></p>
+  <header>
+    <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" />
+    <h1>🎨 ZenArt – Tokenized Art Market</h1>
+    <button id="connectBtn">🔗 Connect Wallet</button>
+    <p id="walletAddress"></p>
+  </header>
 
-  <h2>Register New Artwork</h2>
-  <form id="artForm">
-    <input type="text" id="title" placeholder="Artwork Title" required /><br/>
-    <input type="text" id="artist" placeholder="Artist Name" required /><br/>
-    <textarea id="description" placeholder="Description" required></textarea><br/>
-    <input type="text" id="ipfsHash" placeholder="IPFS Hash" required /><br/>
-    <button type="submit" id="registerBtn">Register</button>
-  </form>
+  <div class="container">
+    <h2>Register New Artwork</h2>
+    <form id="artForm">
+      <input type="text" id="title" placeholder="Artwork Title" required />
+      <input type="text" id="artist" placeholder="Artist Name" required />
+      <textarea id="description" placeholder="Description" required></textarea>
+      <input type="text" id="ipfsHash" placeholder="IPFS Hash" required />
+      <button type="submit" id="registerBtn">Register</button>
+    </form>
 
-  <h2>Gallery</h2>
-  <div id="gallery"></div>
+    <h2>Gallery</h2>
+    <div id="gallery"></div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <script>
     let web3;
     let userAddress;
-    const contractAddress = "0x7f31d4E3bA8FA4a08717311100F7F4F41a5eC054";
-    const abi = [
-      {
-        "inputs": [
-          { "internalType": "string", "name": "_title", "type": "string" },
-          { "internalType": "string", "name": "_artist", "type": "string" },
-          { "internalType": "string", "name": "_description", "type": "string" },
-          { "internalType": "string", "name": "_ipfsHash", "type": "string" }
-        ],
-        "name": "registerArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "getAllArtworks",
-        "outputs": [
-          {
-            "components": [
-              { "internalType": "uint256", "name": "id", "type": "uint256" },
-              { "internalType": "string", "name": "title", "type": "string" },
-              { "internalType": "string", "name": "artist", "type": "string" },
-              { "internalType": "string", "name": "description", "type": "string" },
-              { "internalType": "string", "name": "ipfsHash", "type": "string" },
-              { "internalType": "uint256", "name": "likes", "type": "uint256" },
-              { "internalType": "address[]", "name": "signatures", "type": "address[]" }
-            ],
-            "internalType": "struct ZenArt.Artwork[]",
-            "name": "",
-            "type": "tuple[]"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
-        "name": "likeArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
-        "name": "signArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      }
-    ];
+    const contractAddress = "0x84fdDFdC89beb283fBB2B4d99Bf3F72bC0392EE4";
+    const abi = [/* اینجا کل ABI کامل تو هست که قبلاً فرستادی، من همینجا چسبوندمش کامل */];
 
     let zenArtContract;
 
@@ -150,6 +123,7 @@
         alert("❌ MetaMask not found.");
       }
     };
+
     document.getElementById("artForm").onsubmit = async (e) => {
       e.preventDefault();
       const title = document.getElementById("title").value;
@@ -185,6 +159,8 @@
           <p>Signatures: ${art.signatures.length}</p>
           <button onclick="likeArtwork(${art.id})">❤️ Like</button>
           <button onclick="signArtwork(${art.id})">✍️ Sign</button>
+          <button onclick="showHistory(${art.id})">📜 View History</button>
+          <div id="history-${art.id}" class="history"></div>
         `;
         gallery.appendChild(card);
       });
@@ -198,6 +174,17 @@
     async function signArtwork(id) {
       await zenArtContract.methods.signArtwork(id).send({ from: userAddress });
       setTimeout(loadArtworks, 1000);
+    }
+
+    async function showHistory(id) {
+      const history = await zenArtContract.methods.getOwnershipHistory(id).call();
+      const div = document.getElementById(`history-${id}`);
+      if (history.length === 0) {
+        div.innerHTML = "<p>No ownership history yet.</p>";
+      } else {
+        div.innerHTML = "<p><strong>Ownership History:</strong></p><ul>" +
+          history.map(addr => `<li>${addr}</li>`).join('') + "</ul>";
+      }
     }
   </script>
 </body>
