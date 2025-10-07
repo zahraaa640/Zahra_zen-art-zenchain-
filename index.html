@@ -2,145 +2,70 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZenArt</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #cceeff, #ffe6f0);
-      text-align: center;
-      margin: 0;
-      padding: 20px;
-    }
-    .logo {
-      width: 120px;
-      margin-top: 20px;
-    }
-    h1 {
-      color: #333;
-      margin-top: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #connectBtn {
-      background-color: black;
-      color: white;
-    }
-    #registerBtn {
-      background-color: #28a745;
-      color: white;
-    }
-    input, textarea {
-      width: 80%;
-      padding: 8px;
-      margin: 5px 0;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .art-card {
-      background: white;
-      border-radius: 10px;
-      padding: 10px;
-      margin: 10px auto;
-      width: 90%;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZenArt – Tokenized Art Gallery</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo" />
-  <h1>Welcome to ZenArt</h1>
-  <button id="connectBtn">🔗 Connect Wallet</button>
 
-  <h2>Register New Artwork</h2>
-  <form id="artForm">
+  <h1>🎨 ZenArt – Register Your Artwork</h1>
+
+  <form id="registerForm">
     <input type="text" id="title" placeholder="Artwork Title" required /><br/>
     <input type="text" id="artist" placeholder="Artist Name" required /><br/>
     <textarea id="description" placeholder="Description" required></textarea><br/>
     <input type="text" id="ipfsHash" placeholder="IPFS Hash" required /><br/>
-    <button type="submit" id="registerBtn">Register</button>
+    <button type="submit">Register Artwork</button>
   </form>
 
-  <h2>Gallery</h2>
+  <h2>🖼️ Gallery</h2>
   <div id="gallery"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+  <script src="contract.js"></script>
   <script>
-    let web3;
-    let userAddress;
-    const contractAddress = "0x61e9f79494a8f3e7d7c8c3b1f7b8e1e6b6c3e5f3"; // ← آدرس واقعی ZenChain Testnet
-    const abi = [
-      {
-        "inputs": [
-          { "internalType": "string", "name": "_title", "type": "string" },
-          { "internalType": "string", "name": "_artist", "type": "string" },
-          { "internalType": "string", "name": "_description", "type": "string" },
-          { "internalType": "string", "name": "_ipfsHash", "type": "string" }
-        ],
-        "name": "registerArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      }
-    ];
-    let zenArtContract;
-
-    document.getElementById("connectBtn").onclick = async () => {
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAddress = accounts[0];
-        zenArtContract = new web3.eth.Contract(abi, contractAddress);
-        alert("✅ Wallet connected: " + userAddress);
-      } else {
-        alert("❌ MetaMask not found.");
-      }
-    };
-
-    document.getElementById("artForm").onsubmit = async (e) => {
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const title = document.getElementById("title").value;
-      const artistName = document.getElementById("artist").value;
+      const artist = document.getElementById("artist").value;
       const description = document.getElementById("description").value;
       const ipfsHash = document.getElementById("ipfsHash").value;
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      const userAddress = accounts[0];
 
       try {
-        zenArtContract.methods.registerArtwork(title, artistName, description, ipfsHash)
-          .send({ from: userAddress })
-          .then((receipt) => {
-            if (receipt.transactionHash) {
-              alert("✅ Artwork registered.");
-              document.getElementById('artForm').reset();
-              setTimeout(loadArtworks, 2000);
-            } else {
-              alert("❌ Transaction failed.");
-            }
-          })
-          .catch((error) => {
-            console.error("Registration error:", error);
-            alert("❌ Registration failed.");
-          });
-      } catch (err) {
-        alert("❌ Error: " + err.message);
+        await registerArtwork(title, artist, description, ipfsHash);
+        alert("✅ Artwork registered successfully!");
+        document.getElementById("registerForm").reset();
+        setTimeout(loadGallery, 2000);
+      } catch (error) {
+        alert("❌ Transaction failed.");
+        console.error("Transaction error:", error);
       }
-    };
+    });
 
-    async function loadArtworks() {
-      document.getElementById("gallery").innerHTML = `
-        <div class="art-card">
-          <p><strong>Dog and cat</strong> by Zahra</p>
-          <p>The importance of Zenchain</p>
-          <p>IPFS: bafkreid6m7v5z...</p>
-        </div>
-      `;
+    async function loadGallery() {
+      const artworks = await getAllArtworks();
+      const gallery = document.getElementById("gallery");
+      gallery.innerHTML = "";
+
+      artworks.forEach((art) => {
+        const card = document.createElement("div");
+        card.className = "art-card";
+        card.innerHTML = `
+          <h3>${art.title} by ${art.artist}</h3>
+          <p>${art.description}</p>
+          <a href="https://ipfs.io/ipfs/${art.ipfsHash}" target="_blank">IPFS: ${art.ipfsHash}</a>
+          <p><strong>Likes:</strong> ${art.likes}</p>
+          <p><strong>Signatures:</strong> ${art.signatures.length}</p>
+          <button onclick="likeArtwork(${art.id})">❤️ Like</button>
+          <button onclick="signArtwork(${art.id})">✍️ Sign</button>
+        `;
+        gallery.appendChild(card);
+      });
     }
+
+    window.addEventListener("load", loadGallery);
   </script>
 </body>
-</html> 
+</html>r-radius:  border: 1px  margin: 10px    width: 90%      box-shadow: 0 
