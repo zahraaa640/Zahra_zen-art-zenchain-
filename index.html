@@ -2,50 +2,175 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZenArt – Tokenized Art Gallery</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ZenArt</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom right, #cceeff, #ffe6f0);
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .logo {
+      width: 120px;
+      margin-top: 20px;
+    }
+    h1 {
+      color: #333;
+      margin-top: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #connectBtn {
+      background-color: black;
+      color: white;
+    }
+    #registerBtn {
+      background-color: #28a745;
+      color: white;
+    }
+    input, textarea {
+      width: 80%;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .art-card {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 10px auto;
+      width: 90%;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .art-card button {
+      margin: 5px;
+      background-color: #007BFF;
+      color: white;
+    }
+    .art-card button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
+  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo" />
+  <h1>Welcome to ZenArt</h1>
+  <button id="connectBtn">🔗 Connect Wallet</button>
+  <p id="walletAddress"></p>
 
-  <h1>🎨 ZenArt – Register Your Artwork</h1>
-
-  <form id="registerForm">
+  <h2>Register New Artwork</h2>
+  <form id="artForm">
     <input type="text" id="title" placeholder="Artwork Title" required /><br/>
     <input type="text" id="artist" placeholder="Artist Name" required /><br/>
     <textarea id="description" placeholder="Description" required></textarea><br/>
     <input type="text" id="ipfsHash" placeholder="IPFS Hash" required /><br/>
-    <button type="submit">Register Artwork</button>
+    <button type="submit" id="registerBtn">Register</button>
   </form>
 
-  <h2>🖼️ Gallery</h2>
+  <h2>Gallery</h2>
   <div id="gallery"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
-  <script src="contract.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
   <script>
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    let web3;
+    let userAddress;
+    const contractAddress = "0x7f31d4E3bA8FA4a08717311100F7F4F41a5eC054";
+    const abi = [
+      {
+        "inputs": [
+          { "internalType": "string", "name": "_title", "type": "string" },
+          { "internalType": "string", "name": "_artist", "type": "string" },
+          { "internalType": "string", "name": "_description", "type": "string" },
+          { "internalType": "string", "name": "_ipfsHash", "type": "string" }
+        ],
+        "name": "registerArtwork",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAllArtworks",
+        "outputs": [
+          {
+            "components": [
+              { "internalType": "uint256", "name": "id", "type": "uint256" },
+              { "internalType": "string", "name": "title", "type": "string" },
+              { "internalType": "string", "name": "artist", "type": "string" },
+              { "internalType": "string", "name": "description", "type": "string" },
+              { "internalType": "string", "name": "ipfsHash", "type": "string" },
+              { "internalType": "uint256", "name": "likes", "type": "uint256" },
+              { "internalType": "address[]", "name": "signatures", "type": "address[]" }
+            ],
+            "internalType": "struct ZenArt.Artwork[]",
+            "name": "",
+            "type": "tuple[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
+        "name": "likeArtwork",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
+        "name": "signArtwork",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ];
+
+    let zenArtContract;
+
+    document.getElementById("connectBtn").onclick = async () => {
+      if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        const accounts = await web3.eth.getAccounts();
+        userAddress = accounts[0];
+        zenArtContract = new web3.eth.Contract(abi, contractAddress);
+        document.getElementById("walletAddress").innerText = `✅ Connected: ${userAddress}`;
+        loadArtworks();
+      } else {
+        alert("❌ MetaMask not found.");
+      }
+    };
+    document.getElementById("artForm").onsubmit = async (e) => {
       e.preventDefault();
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
       const description = document.getElementById("description").value;
       const ipfsHash = document.getElementById("ipfsHash").value;
-      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-      const userAddress = accounts[0];
 
       try {
-        await registerArtwork(title, artist, description, ipfsHash);
-        alert("✅ Artwork registered successfully!");
-        document.getElementById("registerForm").reset();
-        setTimeout(loadGallery, 2000);
-      } catch (error) {
-        alert("❌ Transaction failed.");
-        console.error("Transaction error:", error);
+        await zenArtContract.methods.registerArtwork(title, artist, description, ipfsHash)
+          .send({ from: userAddress });
+        alert("✅ Artwork registered.");
+        document.getElementById('artForm').reset();
+        setTimeout(loadArtworks, 2000);
+      } catch (err) {
+        console.error("Registration error:", err);
+        alert("❌ Registration failed.");
       }
-    });
+    };
 
-    async function loadGallery() {
-      const artworks = await getAllArtworks();
+    async function loadArtworks() {
+      const artworks = await zenArtContract.methods.getAllArtworks().call();
       const gallery = document.getElementById("gallery");
       gallery.innerHTML = "";
 
@@ -53,11 +178,11 @@
         const card = document.createElement("div");
         card.className = "art-card";
         card.innerHTML = `
-          <h3>${art.title} by ${art.artist}</h3>
+          <p><strong>${art.title}</strong> by ${art.artist}</p>
           <p>${art.description}</p>
-          <a href="https://ipfs.io/ipfs/${art.ipfsHash}" target="_blank">IPFS: ${art.ipfsHash}</a>
-          <p><strong>Likes:</strong> ${art.likes}</p>
-          <p><strong>Signatures:</strong> ${art.signatures.length}</p>
+          <p>IPFS: <a href="https://ipfs.io/ipfs/${art.ipfsHash}" target="_blank">${art.ipfsHash}</a></p>
+          <p>Likes: ${art.likes}</p>
+          <p>Signatures: ${art.signatures.length}</p>
           <button onclick="likeArtwork(${art.id})">❤️ Like</button>
           <button onclick="signArtwork(${art.id})">✍️ Sign</button>
         `;
@@ -65,7 +190,15 @@
       });
     }
 
-    window.addEventListener("load", loadGallery);
+    async function likeArtwork(id) {
+      await zenArtContract.methods.likeArtwork(id).send({ from: userAddress });
+      setTimeout(loadArtworks, 1000);
+    }
+
+    async function signArtwork(id) {
+      await zenArtContract.methods.signArtwork(id).send({ from: userAddress });
+      setTimeout(loadArtworks, 1000);
+    }
   </script>
 </body>
-</html>r-radius:  border: 1px  margin: 10px    width: 90%      box-shadow: 0 
+</html>
