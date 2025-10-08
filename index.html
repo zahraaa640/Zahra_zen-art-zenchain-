@@ -7,20 +7,16 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to bottom right, #fdf6f0, #e0f7ff);
+      background-color: #fdf6f0;
       margin: 0;
       padding: 0;
+      color: #333;
     }
     header {
       background-color: #222;
       color: white;
       padding: 20px;
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    header img {
-      width: 100px;
-      margin-bottom: 10px;
     }
     h1 {
       margin: 0;
@@ -38,14 +34,7 @@
       border-radius: 5px;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
-    }
-    #connectBtn {
       background-color: #007BFF;
-      color: white;
-    }
-    #registerBtn {
-      background-color: #28a745;
       color: white;
     }
     input, textarea {
@@ -61,14 +50,6 @@
       padding: 15px;
       margin: 15px 0;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
-    .art-card button {
-      background-color: #444;
-      color: white;
-      margin: 5px;
-    }
-    .art-card button:hover {
-      background-color: #000;
     }
     .history {
       background-color: #f9f9f9;
@@ -88,7 +69,6 @@
 </head>
 <body>
   <header>
-    <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" />
     <h1>🎨 ZenArt – Tokenized Art Market</h1>
     <button id="connectBtn">🔗 Connect Wallet</button>
     <p id="walletAddress"></p>
@@ -101,13 +81,13 @@
       <input type="text" id="artist" placeholder="Artist Name" required />
       <textarea id="description" placeholder="Description" required></textarea>
       <input type="text" id="ipfsHash" placeholder="IPFS Hash" required />
-      <button type="submit" id="registerBtn">Register</button>
+      <button type="submit">Register</button>
     </form>
 
     <h2>Gallery</h2>
     <div id="gallery"></div>
 
-    <h2>📊 Transaction Chart</h2>
+    <h2>📊 Popular Artwork by Likes</h2>
     <canvas id="chart" width="800" height="400"></canvas>
   </div>
 
@@ -116,8 +96,8 @@
   <script>
     let web3;
     let userAddress;
-    const contractAddress = "0x84fdDFdC89beb283fBB2B4d99Bf3F72bC0392EE4";
-    const abi = [/* const abi = [
+    const contractAddress = "0x84fd0b9cbe2a3f8fdd294b7f2b3c0392e4f"; // آدرس قراردادت
+    const abi = [
   {
     "anonymous": false,
     "inputs": [
@@ -221,21 +201,26 @@
     "stateMutability": "view",
     "type": "function"
   }
-  ]ا ABI ، */];
+];
 
     let zenArtContract;
 
     document.getElementById("connectBtn").onclick = async () => {
-      if (window.ethereum) {
-        web3 = new Web3(window.ethereum);
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        const accounts = await web3.eth.getAccounts();
-        userAddress = accounts[0];
-        zenArtContract = new web3.eth.Contract(abi, contractAddress);
-        document.getElementById("walletAddress").innerText = `✅ Connected: ${userAddress}`;
-        loadArtworks();
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+          userAddress = accounts[0];
+          web3 = new Web3(window.ethereum);
+          zenArtContract = new web3.eth.Contract(abi, contractAddress);
+          document.getElementById("walletAddress").innerText = `✅ Connected: ${userAddress}`;
+          loadArtworks();
+        } catch (err) {
+          alert("❌ Wallet connection failed.");
+          console.error(err);
+        }
       } else {
-        alert("❌ MetaMask not found.");
+        alert("❌ MetaMask not detected.");
       }
     };
 
@@ -253,8 +238,8 @@
         document.getElementById('artForm').reset();
         setTimeout(loadArtworks, 2000);
       } catch (err) {
-        console.error("Registration error:", err);
         alert("❌ Registration failed.");
+        console.error(err);
       }
     };
 
