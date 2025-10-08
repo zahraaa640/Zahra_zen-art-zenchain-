@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ZenArt – Tokenized Art Market</title>
+  <title>Welcome to ZenArt</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background-color: #fdf6f0;
+      background: linear-gradient(to bottom right, #fdf6f0, #e0f7fa);
       margin: 0;
       padding: 0;
       color: #333;
@@ -69,7 +69,7 @@
 </head>
 <body>
   <header>
-    <h1>🎨 ZenArt – Tokenized Art Market</h1>
+    <h1>Welcome to ZenArt</h1>
     <button id="connectBtn">🔗 Connect Wallet</button>
     <p id="walletAddress"></p>
   </header>
@@ -96,7 +96,7 @@
   <script>
     let web3;
     let userAddress;
-    const contractAddress = "0x84fd0b9cbe2a3f8fdd294b7f2b3c0392e4f"; // آدرس قراردادت
+    const contractAddress = "0xDA0bab807633f07f013f94DD0E6A4F96F8742B53";
     const abi = [
   {
     "anonymous": false,
@@ -136,6 +136,13 @@
     "type": "event"
   },
   {
+    "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
+    "name": "likeArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "string", "name": "_title", "type": "string" },
       { "internalType": "string", "name": "_artist", "type": "string" },
@@ -143,13 +150,6 @@
       { "internalType": "string", "name": "_ipfsHash", "type": "string" }
     ],
     "name": "registerArtwork",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
-    "name": "likeArtwork",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -169,6 +169,21 @@
     "name": "transferArtwork",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "artworks",
+    "outputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "artist", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "ipfsHash", "type": "string" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "uint256", "name": "likes", "type": "uint256" }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -196,8 +211,41 @@
   },
   {
     "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
+    "name": "getArtworkById",
+    "outputs": [
+      { "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "artist", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "ipfsHash", "type": "string" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "uint256", "name": "likes", "type": "uint256" },
+      { "internalType": "address[]", "name": "signatures", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "artId", "type": "uint256" }],
     "name": "getOwnershipHistory",
     "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "ownershipHistory",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   }
@@ -321,4 +369,4 @@
     }
   </script>
 </body>
-  </html>
+</html>
