@@ -125,7 +125,8 @@
       <img src="https://raw.githubusercontent.com/zahraa640/Zahra_zen-art-zenchain-/main/IMG_20251005_132202_322.jpg" alt="ZenChain Logo" />
     </div>
   </footer>
-  <script>
+<script>
+  window.onload = function () {
     const contractAddress = "0x35EC2309dD1c461C7294329AdF84357F5FE3D696";
     const abi = [
       {
@@ -250,6 +251,12 @@
         alert("❌ Error loading artworks: " + err.message);
       }
     }
-  </script>
+
+    // اتصال توابع به window برای دسترسی از دکمه‌ها
+    window.connectWallet = connectWallet;
+    window.registerArtwork = registerArtwork;
+    window.signArtwork = signArtwork;
+  };
+</script>
 </body>
-</html>
+</html>  
