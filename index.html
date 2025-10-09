@@ -128,7 +128,54 @@
 
   <script>
     const contractAddress = "0xe736616Bb6E6Df6e75fE957D77f406AfDC9D3C9B";
-    const abi = [/* your ABI here */];
+    const abi = [
+  {
+    "inputs": [
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "imageURL", "type": "string" },
+      { "internalType": "string", "name": "artist", "type": "string" }
+    ],
+    "name": "registerArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+    "name": "signArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllArtworks",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "title", "type": "string" },
+          { "internalType": "string", "name": "description", "type": "string" },
+          { "internalType": "string", "name": "imageURL", "type": "string" },
+          { "internalType": "string", "name": "artist", "type": "string" },
+          { "internalType": "uint256", "name": "likes", "type": "uint256" }
+        ],
+        "internalType": "struct ZenArt.Artwork[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+    "name": "getSigners",
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
     let provider, signer, contract;
 
     async function connectWallet() {
