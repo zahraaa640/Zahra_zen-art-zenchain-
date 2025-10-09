@@ -4,132 +4,192 @@
   <meta charset="UTF-8" />
   <title>ZenArt – Tokenized Art Market</title>
   <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, button { margin: 5px; padding: 5px; }
+    .section { margin-top: 30px; }
+    #logo { margin-top: 50px; text-align: center; }
+  </style>
 </head>
 <body>
   <h1>ZenArt – Tokenized Art Market</h1>
   <button id="connectBtn">Connect Wallet</button>
 
-  <h2>Register New Artwork</h2>
-  <input id="title" placeholder="Artwork Title" />
-  <input id="artist" placeholder="Artist Name" />
-  <input id="description" placeholder="Description" />
-  <input id="ipfsHash" placeholder="IPFS Hash" />
-  <button id="registerBtn">Register</button>
+  <div class="section">
+    <h2>Register New Artwork</h2>
+    <input id="title" placeholder="Artwork Title" />
+    <input id="artist" placeholder="Artwork Name" />
+    <input id="description" placeholder="Description" />
+    <input id="ipfsHash" placeholder="IPFS Hash" />
+    <button id="registerBtn">Register</button>
+  </div>
 
-  <h2>Sign Artwork</h2>
-  <input id="signId" placeholder="Artwork ID to Sign" />
-  <button id="signBtn">Sign</button>
+  <div class="section">
+    <h2>Sign Artwork</h2>
+    <input id="signId" placeholder="Artwork ID to Sign" />
+    <button id="signBtn">Sign</button>
+  </div>
 
-  <h2>Transfer Ownership</h2>
-  <input id="transferId" placeholder="Artwork ID" />
-  <input id="newOwner" placeholder="New Owner Address" />
-  <button id="transferBtn">Transfer</button>
+  <div class="section">
+    <h2>Transfer Ownership</h2>
+    <input id="transferId" placeholder="Artwork ID" />
+    <input id="newOwner" placeholder="New Owner Address" />
+    <button id="transferBtn">Transfer</button>
+  </div>
 
-  <h2>Gallery</h2>
-  <div id="gallery"></div>
+  <div class="section">
+    <h2>Gallery</h2>
+    <div id="gallery"></div>
+  </div>
 
-  <h2>Signature Table</h2>
-  <table border="1" id="signatureTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Signers</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="section">
+    <h2>Signature Table</h2>
+    <table border="1" id="signatureTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Signers</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-  <!-- ZenChain Logo at bottom -->
-  <div style="margin-top: 40px; text-align: center;">
+  <div id="logo">
     <img src="zenchain-logo.png" alt="ZenChain Logo" width="120" onerror="this.style.display='none'" />
   </div>
 
   <script>
     const contractAddress = "0x03C3b21b3ff382636085AD49026963E17D861F5c";
     const abi = [
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "indexed": false, "internalType": "string", "name": "title", "type": "string" },
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "name": "ArtworkRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "signer", "type": "address" }
+    ],
+    "name": "ArtworkSigned",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "to", "type": "address" }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_title", "type": "string" },
+      { "internalType": "string", "name": "_artist", "type": "string" },
+      { "internalType": "string", "name": "_description", "type": "string" },
+      { "internalType": "string", "name": "_ipfsHash", "type": "string" }
+    ],
+    "name": "registerArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
+    ],
+    "name": "signArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "artworks",
+    "outputs": [
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "artist", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "ipfsHash", "type": "string" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getArtworks",
+    "outputs": [
       {
-        "anonymous": false,
-        "inputs": [
-          { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-          { "indexed": false, "internalType": "string", "name": "title", "type": "string" },
-          { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
+        "components": [
+          { "internalType": "string", "name": "title", "type": "string" },
+          { "internalType": "string", "name": "artist", "type": "string" },
+          { "internalType": "string", "name": "description", "type": "string" },
+          { "internalType": "string", "name": "ipfsHash", "type": "string" },
+          { "internalType": "address[]", "name": "owners", "type": "address[]" },
+          { "internalType": "address[]", "name": "signers", "type": "address[]" }
         ],
-        "name": "ArtworkRegistered",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-          { "indexed": true, "internalType": "address", "name": "signer", "type": "address" }
-        ],
-        "name": "ArtworkSigned",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-          { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
-          { "indexed": true, "internalType": "address", "name": "to", "type": "address" }
-        ],
-        "name": "OwnershipTransferred",
-        "type": "event"
-      },
-      {
-        "inputs": [
-          { "internalType": "string", "name": "_title", "type": "string" },
-          { "internalType": "string", "name": "_artist", "type": "string" },
-          { "internalType": "string", "name": "_description", "type": "string" },
-          { "internalType": "string", "name": "_ipfsHash", "type": "string" }
-        ],
-        "name": "registerArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
-        ],
-        "name": "signArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          { "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-          { "internalType": "address", "name": "newOwner", "type": "address" }
-        ],
-        "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "getArtworks",
-        "outputs": [
-          {
-            "components": [
-              { "internalType": "string", "name": "title", "type": "string" },
-              { "internalType": "string", "name": "artist", "type": "string" },
-              { "internalType": "string", "name": "description", "type": "string" },
-              { "internalType": "string", "name": "ipfsHash", "type": "string" },
-              { "internalType": "address[]", "name": "owners", "type": "address[]" },
-              { "internalType": "address[]", "name": "signers", "type": "address[]" }
-            ],
-            "internalType": "struct ZenArt.Artwork[]",
-            "name": "",
-            "type": "tuple[]"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
+        "internalType": "struct ZenArt.Artwork[]",
+        "name": "",
+        "type": "tuple[]"
       }
-    ];
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
+    ],
+    "name": "getOwners",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
+    ],
+    "name": "getSigners",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalArtworks",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
     let web3, userAddress, zenArt;
 
     document.getElementById("connectBtn").onclick = async () => {
