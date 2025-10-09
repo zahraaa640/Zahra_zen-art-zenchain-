@@ -22,14 +22,14 @@
     }
     button {
       padding: 8px 16px;
-      background-color: #ff4757;
+      background-color: #2ecc71;
       border: none;
       border-radius: 5px;
       color: white;
       cursor: pointer;
     }
     button:hover {
-      background-color: #e84118;
+      background-color: #27ae60;
     }
     input, textarea {
       width: 100%;
@@ -48,7 +48,8 @@
 </head>
 <body>
   <h1>🎨 ZenArt</h1>
-  <p>Register and sign artworks on ZenChain</p>
+  <button onclick="connectWallet()">Connect Wallet</button>
+  <p id="walletStatus" style="margin-top:10px;"></p>
 
   <h2>Register New Artwork</h2>
   <div>
@@ -69,86 +70,163 @@
 
   <script>
     const contractAddress = "0xe736616Bb6E6Df6e75fE957D77f406AfDC9D3C9B";
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZenArt – Tokenized Art Marketplace</title>
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      background: linear-gradient(to bottom right, #222, #444);
-      color: white;
-      padding: 20px;
-    }
-    .artwork {
-      border: 1px solid #666;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 20px;
-      background-color: rgba(0,0,0,0.4);
-    }
-    button {
-      padding: 8px 16px;
-      background-color: #ff4757;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #e84118;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0 10px;
-      border-radius: 5px;
-      border: none;
-    }
-    #chartContainer {
-      margin-top: 40px;
-      background-color: rgba(0,0,0,0.3);
-      padding: 20px;
-      border-radius: 10px;
-    }
-  </style>
-</head>
-<body>
-  <h1>🎨 ZenArt</h1>
-  <p>Register and sign artworks on ZenChain</p>
-
-  <h2>Register New Artwork</h2>
-  <div>
-    <input id="title" placeholder="Artwork Title" />
-    <textarea id="description" placeholder="Artwork Description"></textarea>
-    <input id="imageURL" placeholder="Image URL" />
-    <input id="artist" placeholder="Artist Name" />
-    <button onclick="registerArtwork()">Submit Artwork</button>
-  </div>
-
-  <h2>Registered Artworks</h2>
-  <div id="artworks"></div>
-
-  <div id="chartContainer">
-    <h2>📊 Popular Artworks</h2>
-    <canvas id="likesChart" width="400" height="200"></canvas>
-  </div>
-
-  <script>
-    const contractAddress = "0xe736616Bb6E6Df6e75fE957D77f406AfDC9D3C9B";
-    const contractABI = []; // ← Paste your full ABI array here
+    const contractABI = [
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "name": "ArtworkRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "signer", "type": "address" }
+    ],
+    "name": "ArtworkSigned",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_title", "type": "string" },
+      { "internalType": "string", "name": "_description", "type": "string" },
+      { "internalType": "string", "name": "_imageURL", "type": "string" },
+      { "internalType": "string", "name": "_artist", "type": "string" }
+    ],
+    "name": "registerArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_id", "type": "uint256" }
+    ],
+    "name": "signArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "artworks",
+    "outputs": [
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "imageURL", "type": "string" },
+      { "internalType": "string", "name": "artist", "type": "string" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+      { "internalType": "uint256", "name": "likes", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllArtworks",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "string", "name": "title", "type": "string" },
+          { "internalType": "string", "name": "description", "type": "string" },
+          { "internalType": "string", "name": "imageURL", "type": "string" },
+          { "internalType": "string", "name": "artist", "type": "string" },
+          { "internalType": "address", "name": "owner", "type": "address" },
+          { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+          { "internalType": "uint256", "name": "likes", "type": "uint256" }
+        ],
+        "internalType": "struct ZenArt.Artwork[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_id", "type": "uint256" }
+    ],
+    "name": "getArtworkById",
+    "outputs": [
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "imageURL", "type": "string" },
+      { "internalType": "string", "name": "artist", "type": "string" },
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+      { "internalType": "uint256", "name": "likes", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getArtworkCount",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_id", "type": "uint256" }
+    ],
+    "name": "getSigners",
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "hasSigned",
+    "outputs": [
+      { "internalType": "bool", "name": "", "type": "bool" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "signatures",
+    "outputs": [
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
 
     let provider, signer, contract;
 
     async function connectWallet() {
+      if (typeof window.ethereum === "undefined") {
+        alert("Please install MetaMask to use this site.");
+        return;
+      }
+
       provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       signer = provider.getSigner();
       contract = new ethers.Contract(contractAddress, contractABI, signer);
+
+      const address = await signer.getAddress();
+      document.getElementById("walletStatus").innerText = `Connected: ${address}`;
       loadArtworks();
     }
 
@@ -237,109 +315,6 @@
         }
       });
     }
-
-    connectWallet();
-  </script>
-</body>
-</html>
-
-    let provider, signer, contract;
-
-    async function connectWallet() {
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      signer = provider.getSigner();
-      contract = new ethers.Contract(contractAddress, contractABI, signer);
-      loadArtworks();
-    }
-
-    async function registerArtwork() {
-      const title = document.getElementById("title").value;
-      const description = document.getElementById("description").value;
-      const imageURL = document.getElementById("imageURL").value;
-      const artist = document.getElementById("artist").value;
-
-      try {
-        const tx = await contract.registerArtwork(title, description, imageURL, artist);
-        await tx.wait();
-        alert("Artwork registered successfully!");
-        loadArtworks();
-      } catch (err) {
-        console.error("Registration failed:", err);
-        alert("Error registering artwork.");
-      }
-    }
-
-    async function loadArtworks() {
-      const artworks = await contract.getAllArtworks();
-      const container = document.getElementById("artworks");
-      container.innerHTML = "";
-
-      const labels = [];
-      const data = [];
-
-      for (let i = 0; i < artworks.length; i++) {
-        const art = artworks[i];
-        const hasSigned = await contract.hasSigned(i, await signer.getAddress());
-
-        labels.push(art.title);
-        data.push(Number(art.likes));
-
-        const div = document.createElement("div");
-        div.className = "artwork";
-        div.innerHTML = `
-          <h3>${art.title}</h3>
-          <p>${art.description}</p>
-          <p>Artist: ${art.artist}</p>
-          <img src="${art.imageURL}" alt="Artwork" style="max-width:100%; border-radius:8px;" />
-          <p>Owner: ${art.owner}</p>
-          <p>Signatures: ${art.likes}</p>
-          <button onclick="signArtwork(${i})" ${hasSigned ? "disabled" : ""}>
-            ${hasSigned ? "Signed" : "Sign"}
-          </button>
-        `;
-        container.appendChild(div);
-      }
-
-      renderChart(labels, data);
-    }
-
-    async function signArtwork(id) {
-      try {
-        const tx = await contract.signArtwork(id);
-        await tx.wait();
-        alert("Artwork signed successfully!");
-        loadArtworks();
-      } catch (err) {
-        console.error("Signing error:", err);
-        alert("Error signing artwork.");
-      }
-    }
-
-    function renderChart(labels, data) {
-      const ctx = document.getElementById("likesChart").getContext("2d");
-      new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: labels,
-          datasets: [{
-            label: "Signatures",
-            data: data,
-            backgroundColor: "#ff4757"
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-
-    connectWallet();
   </script>
 </body>
 </html>
