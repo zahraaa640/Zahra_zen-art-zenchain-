@@ -1,43 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa">
 <head>
   <meta charset="UTF-8" />
-  <title>Welcome to ZenArt</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZenArt – Tokenized Art Market</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       font-family: sans-serif;
-      background: #f5f5f5;
+      background: #f9f9f9;
       margin: 0;
-      padding: 0;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      direction: rtl;
+    }
+    h1, h2 {
+      color: #333;
       text-align: center;
     }
-    header {
-      background-color: #fff;
-      padding: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    header h1 {
-      margin: 0;
-      font-size: 26px;
-      color: #333;
-    }
-    .section {
-      background: #fff;
-      margin: 20px auto;
-      padding: 20px;
-      max-width: 500px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
     input, button {
-      width: 100%;
+      margin: 10px 0;
       padding: 10px;
-      margin: 8px 0;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      width: 100%;
       box-sizing: border-box;
     }
     button {
@@ -49,30 +35,26 @@
     button:hover {
       background-color: #45a049;
     }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
     table {
-      width: 100%;
-      margin-top: 20px;
       border-collapse: collapse;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      font-size: 14px;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    footer {
-      margin-top: 40px;
-      padding: 20px;
+      margin-top: 20px;
+      width: 100%;
       background: #fff;
     }
-    footer div {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
     }
-    footer img {
+    .logo {
+      display: block;
+      margin: 40px auto 0;
       width: 120px;
       border-radius: 12px;
     }
@@ -80,61 +62,47 @@
 </head>
 <body>
 
-  <header>
-    <h1>Welcome to ZenArt</h1>
-    <button onclick="connectWallet()">Connect Wallet</button>
-    <p id="walletStatus">Wallet not connected</p>
-  </header>
+  <h1>🎨 ZenArt – Tokenized Art Market</h1>
+  <button onclick="connectWallet()">🔗 اتصال کیف پول</button>
+  <p id="walletStatus">کیف پول وصل نشده</p>
 
-  <div class="section">
-    <h2>Register New Artwork</h2>
-    <input id="title" placeholder="Artwork Title" />
-    <input id="artist" placeholder="Artist Name" />
-    <input id="description" placeholder="Description" />
-    <input id="ipfsHash" placeholder="IPFS Hash" />
-    <button onclick="registerArtwork()">Register</button>
-  </div>
+  <h2>ثبت اثر هنری جدید</h2>
+  <input id="title" placeholder="عنوان اثر" />
+  <input id="artist" placeholder="نام هنرمند" />
+  <input id="description" placeholder="توضیحات" />
+  <input id="imageURL" placeholder="IPFS Hash" />
+  <button onclick="registerArtwork()">ثبت اثر</button>
 
-  <div class="section">
-    <h2>Sign Artwork</h2>
-    <input id="artworkId" placeholder="Artwork ID to Sign" type="number" />
-    <button onclick="signArtwork()">Sign</button>
-  </div>
+  <h2>🖋️ امضا کردن اثر</h2>
+  <input id="artworkId" placeholder="شناسه اثر برای امضا" type="number" />
+  <button onclick="signArtwork()">امضا</button>
 
-  <div class="section">
-    <h2>Gallery</h2>
-    <div id="gallery"></div>
-  </div>
+  <h2>🖼️ گالری آثار</h2>
+  <div id="gallery"></div>
 
-  <div class="section">
-    <h2>Signature Table</h2>
-    <table id="signatureTable">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Title</th>
-          <th>Signers</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
+  <h2>📋 جدول امضاکنندگان</h2>
+  <table id="signatureTable">
+    <thead>
+      <tr>
+        <th>شناسه</th>
+        <th>عنوان</th>
+        <th>امضاکنندگان</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-  <footer>
-    <div>
-      <img src="https://raw.githubusercontent.com/zahraa640/Zahra_zen-art-zenchain-/main/IMG_20251005_132202_322.jpg" alt="ZenChain Logo" />
-    </div>
-  </footer>
-<script>
+  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo" />
+  <script>
   window.onload = function () {
-    const contractAddress = "0x35EC2309dD1c461C7294329AdF84357F5FE3D696";
+    const contractAddress = "0xe736616Bb6E6Df6e75fE957D77f406AfDC9D3C9B";
     const abi = [
       {
         "inputs": [
           { "internalType": "string", "name": "title", "type": "string" },
-          { "internalType": "string", "name": "artist", "type": "string" },
           { "internalType": "string", "name": "description", "type": "string" },
-          { "internalType": "string", "name": "ipfsHash", "type": "string" }
+          { "internalType": "string", "name": "imageURL", "type": "string" },
+          { "internalType": "string", "name": "artist", "type": "string" }
         ],
         "name": "registerArtwork",
         "outputs": [],
@@ -142,9 +110,7 @@
         "type": "function"
       },
       {
-        "inputs": [
-          { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
-        ],
+        "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
         "name": "signArtwork",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -152,21 +118,28 @@
       },
       {
         "inputs": [],
-        "name": "getArtworks",
+        "name": "getAllArtworks",
         "outputs": [
           {
             "components": [
               { "internalType": "string", "name": "title", "type": "string" },
-              { "internalType": "string", "name": "artist", "type": "string" },
               { "internalType": "string", "name": "description", "type": "string" },
-              { "internalType": "string", "name": "ipfsHash", "type": "string" },
-              { "internalType": "address[]", "name": "signers", "type": "address[]" }
+              { "internalType": "string", "name": "imageURL", "type": "string" },
+              { "internalType": "string", "name": "artist", "type": "string" },
+              { "internalType": "uint256", "name": "likes", "type": "uint256" }
             ],
             "internalType": "struct ZenArt.Artwork[]",
             "name": "",
             "type": "tuple[]"
           }
         ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+        "name": "getSigners",
+        "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
         "stateMutability": "view",
         "type": "function"
       }
@@ -182,46 +155,47 @@
           signer = provider.getSigner();
           contract = new ethers.Contract(contractAddress, abi, signer);
           const address = await signer.getAddress();
-          document.getElementById("walletStatus").innerText = `✅ Connected: ${address}`;
+          document.getElementById("walletStatus").innerText = `✅ متصل شد: ${address}`;
+          loadArtworks();
         } catch (err) {
-          alert("❌ Wallet connection failed: " + err.message);
+          alert("❌ اتصال به کیف پول انجام نشد: " + err.message);
         }
       } else {
-        alert("❗ MetaMask is not installed or not detected.");
+        alert("❗ MetaMask نصب نیست یا اکستنشن فعال نیست.");
       }
     }
 
     async function registerArtwork() {
-      if (!contract) return alert("❗ Wallet not connected.");
+      if (!contract) return alert("❗ کیف پول وصل نشده.");
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
       const description = document.getElementById("description").value;
-      const ipfsHash = document.getElementById("ipfsHash").value;
+      const imageURL = document.getElementById("imageURL").value;
       try {
-        await contract.registerArtwork(title, artist, description, ipfsHash);
-        alert("✅ Artwork registered.");
+        await contract.registerArtwork(title, description, imageURL, artist);
+        alert("✅ اثر هنری ثبت شد.");
         loadArtworks();
       } catch (err) {
-        alert("❌ Registration error: " + err.message);
+        alert("❌ خطا در ثبت اثر: " + err.message);
       }
     }
 
     async function signArtwork() {
-      if (!contract) return alert("❗ Wallet not connected.");
+      if (!contract) return alert("❗ کیف پول وصل نشده.");
       const id = document.getElementById("artworkId").value;
       try {
         await contract.signArtwork(id);
-        alert("✅ Artwork signed.");
+        alert("✅ اثر با موفقیت امضا شد.");
         loadArtworks();
       } catch (err) {
-        alert("❌ Signing error: " + err.message);
+        alert("❌ خطا در امضا: " + err.message);
       }
     }
 
     async function loadArtworks() {
       if (!contract) return;
       try {
-        const artworks = await contract.getArtworks();
+        const artworks = await contract.getAllArtworks();
         const gallery = document.getElementById("gallery");
         const tableBody = document.querySelector("#signatureTable tbody");
         gallery.innerHTML = "";
@@ -229,12 +203,15 @@
 
         for (let i = 0; i < artworks.length; i++) {
           const art = artworks[i];
+          const signers = await contract.getSigners(i);
+
           const card = document.createElement("div");
           card.innerHTML = `
             <h3>${art.title} (#${i})</h3>
-            <p><strong>Artist:</strong> ${art.artist}</p>
-            <p><strong>Description:</strong> ${art.description}</p>
-            <img src="https://ipfs.io/ipfs/${art.ipfsHash}" style="max-width:100%; border-radius:8px;" />
+            <p><strong>هنرمند:</strong> ${art.artist}</p>
+            <p><strong>توضیحات:</strong> ${art.description}</p>
+            <p><strong>لایک‌ها:</strong> ${art.likes}</p>
+            <img src="https://ipfs.io/ipfs/${art.imageURL}" />
             <hr/>
           `;
           gallery.appendChild(card);
@@ -243,20 +220,20 @@
           row.innerHTML = `
             <td>${i}</td>
             <td>${art.title}</td>
-            <td>${art.signers.join("<br/>")}</td>
+            <td>${signers.join("<br/>")}</td>
           `;
           tableBody.appendChild(row);
         }
       } catch (err) {
-        alert("❌ Error loading artworks: " + err.message);
+        alert("❌ خطا در بارگذاری آثار: " + err.message);
       }
     }
 
-    // اتصال توابع به window برای دسترسی از دکمه‌ها
+    // اتصال توابع به window برای دکمه‌ها
     window.connectWallet = connectWallet;
     window.registerArtwork = registerArtwork;
     window.signArtwork = signArtwork;
   };
 </script>
 </body>
-</html>  
+</html>
