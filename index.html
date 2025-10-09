@@ -5,7 +5,8 @@
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    input, button { margin: 5px; padding: 8px; }
+    input, button { margin: 5px; padding: 8px; font-size: 16px; }
+    input[type="number"] { width: 100%; }
     table { border-collapse: collapse; margin-top: 20px; width: 100%; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
   </style>
@@ -23,7 +24,7 @@
   <button onclick="registerArtwork()">Register</button>
 
   <h2>🖋️ Sign Artwork</h2>
-  <input id="artworkId" placeholder="Artwork ID to Sign" />
+  <input id="artworkId" placeholder="Artwork ID to Sign" type="number" style="z-index:999; position:relative;" />
   <button onclick="signArtwork()">Sign</button>
 
   <h2>🖼️ Gallery</h2>
@@ -203,14 +204,14 @@
       const description = document.getElementById("description").value;
       const imageURL = document.getElementById("imageURL").value;
       await contract.registerArtwork(title, description, imageURL, artist);
-      alert("Artwork registered!");
+      alert("✅ Artwork registered.");
       loadArtworks();
     }
 
     async function signArtwork() {
       const id = document.getElementById("artworkId").value;
       await contract.signArtwork(id);
-      alert("Artwork signed!");
+      alert("✅ Artwork signed.");
       loadArtworks();
     }
 
