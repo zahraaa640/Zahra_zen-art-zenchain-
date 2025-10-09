@@ -67,6 +67,11 @@
       padding: 20px;
       background: #fff;
     }
+    footer div {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     footer img {
       width: 120px;
       border-radius: 12px;
@@ -116,7 +121,9 @@
   </div>
 
   <footer>
-    <img src="https://raw.githubusercontent.com/zahrasadeqi/zahra_pen-art-zenohian/main/IMG_20251005_132202_322.jpg" alt="Zenohian Logo" />
+    <div>
+      <img src="https://raw.githubusercontent.com/zahrasadeqi/zahra_pen-art-zenohian/main/IMG_20251005_132202_322.jpg" alt="Zenohian Logo" />
+    </div>
   </footer>
 
   <script>
@@ -188,7 +195,7 @@
             <p><strong>Artist:</strong> ${art.artist}</p>
             <p><strong>Description:</strong> ${art.description}</p>
             <p><strong>Likes:</strong> ${art.likes}</p>
-            <img src="https://ipfs.io/ipfs/${art.imageURL}" />
+            <img src="https://ipfs.io/ipfs/${art.imageURL}" style="max-width:100%; border-radius:8px;" />
             <hr/>
           `;
           gallery.appendChild(card);
