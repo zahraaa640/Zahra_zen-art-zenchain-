@@ -176,9 +176,10 @@
       const description = document.getElementById("description").value;
       const imageURL = document.getElementById("imageURL").value;
       try {
-        await contract.registerArtwork(title, description, imageURL, artist);
+        const tx = await contract.registerArtwork(title, description, imageURL, artist);
+        await tx.wait(); // ✅ منتظر تأیید بلاک باش
         alert("✅ Artwork registered.");
-        loadArtworks();
+        loadArtworks(); // حالا گالری رو بارگذاری کن
       } catch (err) {
         alert("❌ Registration error: " + err.message);
       }
@@ -188,7 +189,8 @@
       if (!contract) return alert("❗ Wallet not connected.");
       const id = document.getElementById("artworkId").value;
       try {
-        await contract.signArtwork(id);
+        const tx = await contract.signArtwork(id);
+        await tx.wait(); // ✅ منتظر تأیید بلاک باش
         alert("✅ Artwork signed.");
         loadArtworks();
       } catch (err) {
@@ -235,5 +237,3 @@
   </script>
 </body>
 </html>
-  
-  
