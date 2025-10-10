@@ -99,55 +99,121 @@
   <script type="module">
     import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
 
-    const contractAddress = "0xe736616Bb6E6Df6e75fE957D77f406AfDC9D3C9B";
-    const abi = [
+    const contractAddress = "0xF406047e80196FF1d1eB6F8F873eA097bd4C87DD";
+const abi = [
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "indexed": false, "internalType": "string", "name": "title", "type": "string" },
+      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "name": "ArtworkRegistered",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "signer", "type": "address" }
+    ],
+    "name": "ArtworkSigned",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+      { "indexed": true, "internalType": "address", "name": "to", "type": "address" }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_title", "type": "string" },
+      { "internalType": "string", "name": "_artist", "type": "string" },
+      { "internalType": "string", "name": "_description", "type": "string" },
+      { "internalType": "string", "name": "_ipfsHash", "type": "string" }
+    ],
+    "name": "registerArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+    "name": "signArtwork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "artworkId", "type": "uint256" },
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "artworks",
+    "outputs": [
+      { "internalType": "string", "name": "title", "type": "string" },
+      { "internalType": "string", "name": "artist", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "ipfsHash", "type": "string" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getArtworks",
+    "outputs": [
       {
-        "inputs": [
+        "components": [
           { "internalType": "string", "name": "title", "type": "string" },
+          { "internalType": "string", "name": "artist", "type": "string" },
           { "internalType": "string", "name": "description", "type": "string" },
-          { "internalType": "string", "name": "imageURL", "type": "string" },
-          { "internalType": "string", "name": "artist", "type": "string" }
+          { "internalType": "string", "name": "ipfsHash", "type": "string" },
+          { "internalType": "address[]", "name": "owners", "type": "address[]" },
+          { "internalType": "address[]", "name": "signers", "type": "address[]" }
         ],
-        "name": "registerArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
-        "name": "signArtwork",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "getAllArtworks",
-        "outputs": [
-          {
-            "components": [
-              { "internalType": "string", "name": "title", "type": "string" },
-              { "internalType": "string", "name": "description", "type": "string" },
-              { "internalType": "string", "name": "imageURL", "type": "string" },
-              { "internalType": "string", "name": "artist", "type": "string" },
-              { "internalType": "uint256", "name": "likes", "type": "uint256" }
-            ],
-            "internalType": "struct ZenArt.Artwork[]",
-            "name": "",
-            "type": "tuple[]"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
-        "name": "getSigners",
-        "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
-        "stateMutability": "view",
-        "type": "function"
+        "internalType": "struct ZenArt.Artwork[]",
+        "name": "",
+        "type": "tuple[]"
       }
-    ];
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+    "name": "getOwners",
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+    "name": "getSigners",
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalArtworks",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
 
     let provider, signer, contract;
 
@@ -174,12 +240,12 @@
       const title = document.getElementById("title").value;
       const artist = document.getElementById("artist").value;
       const description = document.getElementById("description").value;
-      const imageURL = document.getElementById("imageURL").value;
+      const ipfsHash = document.getElementById("imageURL").value;
       try {
-        const tx = await contract.registerArtwork(title, description, imageURL, artist);
-        await tx.wait(); // ✅ منتظر تأیید بلاک باش
+        const tx = await contract.registerArtwork(title, artist, description, ipfsHash);
+        await tx.wait();
         alert("✅ Artwork registered.");
-        loadArtworks(); // حالا گالری رو بارگذاری کن
+        loadArtworks();
       } catch (err) {
         alert("❌ Registration error: " + err.message);
       }
@@ -190,7 +256,7 @@
       const id = document.getElementById("artworkId").value;
       try {
         const tx = await contract.signArtwork(id);
-        await tx.wait(); // ✅ منتظر تأیید بلاک باش
+        await tx.wait();
         alert("✅ Artwork signed.");
         loadArtworks();
       } catch (err) {
@@ -201,7 +267,7 @@
     async function loadArtworks() {
       if (!contract) return;
       try {
-        const artworks = await contract.getAllArtworks();
+        const artworks = await contract.getArtworks();
         const gallery = document.getElementById("gallery");
         const tableBody = document.querySelector("#signatureTable tbody");
         gallery.innerHTML = "";
@@ -209,15 +275,13 @@
 
         for (let i = 0; i < artworks.length; i++) {
           const art = artworks[i];
-          const signers = await contract.getSigners(i);
 
           const card = document.createElement("div");
           card.innerHTML = `
             <h3>${art.title} (#${i})</h3>
             <p><strong>Artist:</strong> ${art.artist}</p>
             <p><strong>Description:</strong> ${art.description}</p>
-            <p><strong>Likes:</strong> ${art.likes}</p>
-            <img src="https://ipfs.io/ipfs/${art.imageURL}" />
+            <img src="https://ipfs.io/ipfs/${art.ipfsHash}" />
             <hr/>
           `;
           gallery.appendChild(card);
@@ -226,7 +290,7 @@
           row.innerHTML = `
             <td>${i}</td>
             <td>${art.title}</td>
-            <td>${signers.join("<br/>")}</td>
+            <td>${art.signers.join("<br/>")}</td>
           `;
           tableBody.appendChild(row);
         }
