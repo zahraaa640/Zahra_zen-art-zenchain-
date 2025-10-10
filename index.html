@@ -2,105 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>ZenChain – Tokenized Art Market</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZenChain Art Registry</title>
   <style>
     body {
       font-family: sans-serif;
-      background: #f9f9f9;
-      margin: 0;
       padding: 20px;
-      max-width: 600px;
-      margin: auto;
-      text-align: center;
+      background-color: #f5f5f5;
     }
-    h1, h2 {
+    h2 {
       color: #333;
     }
     input, button {
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 16px;
+      margin: 5px 0;
+      padding: 8px;
       width: 100%;
-      box-sizing: border-box;
+      max-width: 400px;
     }
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
+    .logo {
+      width: 120px;
+      margin-top: 20px;
     }
-    button:hover {
-      background-color: #45a049;
+    #gallery div {
+      background: #fff;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     table {
+      width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      width: 100%;
-      background: #fff;
     }
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: left;
     }
-    .logo-top {
-      display: block;
-      margin: 20px auto 10px;
-      width: 140px;
-      border-radius: 12px;
-    }
-    .logo-bottom {
-      display: block;
-      margin: 60px auto 0;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 20px;
-    }
   </style>
 </head>
 <body>
+  <h1>ZenChain Art Registry</h1>
+<p id="walletStatus">🔌 Wallet not connected</p>
+<button onclick="connectWallet()">Connect Wallet</button>
 
-  <!-- لوگو بالا -->
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-top" />
-  <h1>Welcome to ZenChain</h1>
+<hr/>
 
-  <button onclick="connectWallet()">Connect Wallet</button>
-  <p id="walletStatus">Wallet not connected</p>
+<h2>Register Artwork</h2>
+<input id="title" placeholder="Artwork Title" type="text" />
+<input id="artist" placeholder="Artist Name" type="text" />
+<input id="description" placeholder="Artwork Description" type="text" />
+<input id="imageURL" placeholder="IPFS Hash (e.g. Qm...)" type="text" />
+<button onclick="registerArtwork()">Register</button>
 
-  <h2>Register New Artwork</h2>
-  <input id="title" placeholder="Artwork Title" />
-  <input id="artist" placeholder="Artist Name" />
-  <input id="description" placeholder="Description" />
-  <input id="imageURL" placeholder="IPFS Hash" />
-  <button onclick="registerArtwork()">Register</button>
+<hr/>
 
-  <h2>Sign Artwork</h2>
-  <input id="artworkId" placeholder="Artwork ID to Sign" type="number" />
-  <button onclick="signArtwork()">Sign</button>
+<h2>Sign Artwork</h2>
+<input id="artworkId" placeholder="Artwork ID to Sign" type="number" />
+<button onclick="signArtwork()">Sign</button>
 
-  <h2>Gallery</h2>
-  <div id="gallery"></div>
+<hr/>
 
-  <h2>Signature Table</h2>
-  <table id="signatureTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Signers</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<h2>Gallery</h2>
+<div id="gallery"></div>
 
-  <!-- لوگو پایین -->
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-bottom" />
+<h2>Signature Table</h2>
+<table id="signatureTable">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Signers</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<img src="IMG_20200510_132202_322.JPG" alt="ZenChain Logo" class="logo" />
   <script type="module">
-    import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
+  import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
 
-    const contractAddress = "0xF406047e80196FF1d1eB6F8F873eA097bd4C87DD";
-const abi = [
+  const contractAddress = "0xF406047e80196FF1d1eB6F8F873eA097bd4C87DD";
+  const abi = [
   {
     "anonymous": false,
     "inputs": [
@@ -215,89 +198,96 @@ const abi = [
   }
 ]
 
-    let provider, signer, contract;
+  let provider, signer, contract;
 
-    window.connectWallet = async function () {
-      if (typeof window.ethereum !== "undefined") {
-        try {
-          provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-          await provider.send("eth_requestAccounts", []);
-          signer = provider.getSigner();
-          contract = new ethers.Contract(contractAddress, abi, signer);
-          const address = await signer.getAddress();
-          document.getElementById("walletStatus").innerText = `✅ Connected: ${address}`;
-          loadArtworks();
-        } catch (err) {
-          alert("❌ Wallet connection failed: " + err.message);
-        }
-      } else {
-        alert("❗ MetaMask is not installed or not detected.");
-      }
-    };
-
-    window.registerArtwork = async function () {
-      if (!contract) return alert("❗ Wallet not connected.");
-      const title = document.getElementById("title").value;
-      const artist = document.getElementById("artist").value;
-      const description = document.getElementById("description").value;
-      const ipfsHash = document.getElementById("imageURL").value;
+  window.connectWallet = async function () {
+    if (typeof window.ethereum !== "undefined") {
       try {
-        const tx = await contract.registerArtwork(title, artist, description, ipfsHash);
-        await tx.wait();
-        alert("✅ Artwork registered.");
+        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        contract = new ethers.Contract(contractAddress, abi, signer);
+        const address = await signer.getAddress();
+        document.getElementById("walletStatus").innerText = `✅ Connected: ${address}`;
         loadArtworks();
       } catch (err) {
-        alert("❌ Registration error: " + err.message);
+        alert("❌ Wallet connection failed: " + err.message);
       }
-    };
-
-    window.signArtwork = async function () {
-      if (!contract) return alert("❗ Wallet not connected.");
-      const id = document.getElementById("artworkId").value;
-      try {
-        const tx = await contract.signArtwork(id);
-        await tx.wait();
-        alert("✅ Artwork signed.");
-        loadArtworks();
-      } catch (err) {
-        alert("❌ Signing error: " + err.message);
-      }
-    };
-
-    async function loadArtworks() {
-      if (!contract) return;
-      try {
-        const artworks = await contract.getArtworks();
-        const gallery = document.getElementById("gallery");
-        const tableBody = document.querySelector("#signatureTable tbody");
-        gallery.innerHTML = "";
-        tableBody.innerHTML = "";
-
-        for (let i = 0; i < artworks.length; i++) {
-          const art = artworks[i];
-
-          const card = document.createElement("div");
-          card.innerHTML = `
-            <h3>${art.title} (#${i})</h3>
-            <p><strong>Artist:</strong> ${art.artist}</p>
-            <p><strong>Description:</strong> ${art.description}</p>
-            <img src="https://ipfs.io/ipfs/${art.ipfsHash}" />
-            <hr/>
-          `;
-          gallery.appendChild(card);
-
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${i}</td>
-            <td>${art.title}</td>
-            <td>${art.signers.join("<br/>")}</td>
-          `;
-          tableBody.appendChild(row);
-        }
-      } catch (err) {
-        alert("❌ Error loading artworks: " + err.message);
-      }
+    } else {
+      alert("❗ MetaMask is not installed or not detected.");
     }
-  </script>
+  };
+
+  window.registerArtwork = async function () {
+    if (!contract) return alert("❗ کیف پول وصل نیست.");
+
+    const title = document.getElementById("title").value.trim();
+    const artist = document.getElementById("artist").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const ipfsHash = document.getElementById("imageURL").value.trim();
+
+    if (!title || !artist || !description || !ipfsHash) {
+      return alert("❗ لطفاً همه‌ی فیلدها را کامل پر کنید.");
+    }
+
+    try {
+      const tx = await contract.registerArtwork(title, artist, description, ipfsHash);
+      await tx.wait();
+      alert("✅ اثر هنری با موفقیت ثبت شد.");
+      loadArtworks();
+    } catch (err) {
+      alert("❌ Registration error: " + err.message);
+    }
+  };
+
+  window.signArtwork = async function () {
+    if (!contract) return alert("❗ کیف پول وصل نیست.");
+    const id = document.getElementById("artworkId").value;
+    try {
+      const tx = await contract.signArtwork(id);
+      await tx.wait();
+      alert("✅ اثر با موفقیت امضا شد.");
+      loadArtworks();
+    } catch (err) {
+      alert("❌ Signing error: " + err.message);
+    }
+  };
+
+  async function loadArtworks() {
+    if (!contract) return;
+    try {
+      const artworks = await contract.getArtworks();
+      const gallery = document.getElementById("gallery");
+      const tableBody = document.querySelector("#signatureTable tbody");
+      gallery.innerHTML = "";
+      tableBody.innerHTML = "";
+
+      for (let i = 0; i < artworks.length; i++) {
+        const art = artworks[i];
+
+        const card = document.createElement("div");
+        card.innerHTML = `
+          <h3>${art.title} (#${i})</h3>
+          <p><strong>Artist:</strong> ${art.artist}</p>
+          <p><strong>Description:</strong> ${art.description}</p>
+          <img src="https://ipfs.io/ipfs/${art.ipfsHash}" alt="${art.title}" />
+          <p><strong>Owners:</strong><br/> ${art.owners.join("<br/>")}</p>
+          <p><strong>Signers:</strong><br/> ${art.signers.join("<br/>")}</p>
+          <hr/>
+        `;
+        gallery.appendChild(card);
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${art.title}</td>
+          <td>${art.signers.join("<br/>")}</td>
+        `;
+        tableBody.appendChild(row);
+      }
+    } catch (err) {
+      alert("❌ Error loading artworks: " + err.message);
+    }
+  }
+</script>
 </body>
 </html>
