@@ -7,9 +7,9 @@
   <style>
     body {
       font-family: sans-serif;
-      padding: 20px;
       background-color: #f5f5f5;
-      direction: ltr;
+      margin: 0;
+      padding: 20px;
       text-align: center;
     }
     h1, h2 {
@@ -46,13 +46,13 @@
     }
     .logo-top {
       width: 100px;
-      margin: 10px auto;
+      margin: 0 auto 10px;
       display: block;
     }
     .logo-bottom {
       width: 100%;
       max-width: 500px;
-      margin: 30px auto 0;
+      margin: 40px auto 0;
       display: block;
     }
     .section {
@@ -82,13 +82,12 @@
 </head>
 <body>
 
+<!-- Logo before Welcome -->
 <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-top" />
 
 <h1>Welcome to ZenChain</h1>
 <p id="walletStatus">🔌 Wallet not connected</p>
 <button onclick="connectWallet()">Connect Wallet</button>
-
-<hr/>
 
 <div class="section">
   <h2>Register New Artwork</h2>
@@ -99,15 +98,11 @@
   <button onclick="registerArtwork()">Register</button>
 </div>
 
-<hr/>
-
 <div class="section">
   <h2>Sign Artwork</h2>
-  <input id="artworkId" placeholder="Score" type="number" />
+  <input id="artworkId" placeholder="Artwork ID to Sign" type="number" />
   <button onclick="signArtwork()">Sign</button>
 </div>
-
-<hr/>
 
 <div class="section">
   <h2>Gallery</h2>
@@ -128,13 +123,14 @@
   </table>
 </div>
 
+<!-- Large logo at bottom -->
 <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-bottom" />
 
 <script type="module">
   import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
 
   const contractAddress = "0xB3aaC4b4E70096b1d44a68E8998F1Af57Fc87668";
-  export const abi = [
+  const abi = [
   {
     "anonymous": false,
     "inputs": [
@@ -152,16 +148,6 @@
       { "indexed": true, "internalType": "address", "name": "signer", "type": "address" }
     ],
     "name": "ArtworkSigned",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "to", "type": "address" }
-    ],
-    "name": "OwnershipTransferred",
     "type": "event"
   },
   {
@@ -183,30 +169,6 @@
     "name": "signArtwork",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-      { "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
-    "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "name": "artworks",
-    "outputs": [
-      { "internalType": "string", "name": "title", "type": "string" },
-      { "internalType": "string", "name": "artist", "type": "string" },
-      { "internalType": "string", "name": "description", "type": "string" },
-      { "internalType": "string", "name": "ipfsHash", "type": "string" }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
