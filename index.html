@@ -82,7 +82,6 @@
 </head>
 <body>
 
-<!-- Logo before Welcome -->
 <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-top" />
 
 <h1>Welcome to ZenChain</h1>
@@ -130,107 +129,53 @@
   </table>
 </div>
 
-<!-- Large logo at bottom -->
 <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-bottom" />
-
 <script type="module">
   import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm";
 
-  const contractAddress = "0xB3aaC4b4E70096b1d44a68E8998F1Af57Fc87668";
+  const contractAddress = "0x81cFd4D64609a48dea018F93348ABD1465E58372";
   const abi = [
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-      { "indexed": false, "internalType": "string", "name": "title", "type": "string" },
-      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
-    ],
-    "name": "ArtworkRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "signer", "type": "address" }
-    ],
-    "name": "ArtworkSigned",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      { "internalType": "string", "name": "_title", "type": "string" },
-      { "internalType": "string", "name": "_artist", "type": "string" },
-      { "internalType": "string", "name": "_description", "type": "string" },
-      { "internalType": "string", "name": "_ipfsHash", "type": "string" }
-    ],
-    "name": "registerArtwork",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
-    ],
-    "name": "signArtwork",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getArtworks",
-    "outputs": [
-      {
-        "components": [
-          { "internalType": "string", "name": "title", "type": "string" },
-          { "internalType": "string", "name": "artist", "type": "string" },
-          { "internalType": "string", "name": "description", "type": "string" },
-          { "internalType": "string", "name": "ipfsHash", "type": "string" },
-          { "internalType": "address[]", "name": "owners", "type": "address[]" },
-          { "internalType": "address[]", "name": "signers", "type": "address[]" }
-        ],
-        "internalType": "struct ZenArt.Artwork[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
-    ],
-    "name": "getOwners",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
-    ],
-    "name": "getSigners",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "totalArtworks",
-    "outputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
+    {
+      "inputs": [
+        { "internalType": "string", "name": "_title", "type": "string" },
+        { "internalType": "string", "name": "_artist", "type": "string" },
+        { "internalType": "string", "name": "_description", "type": "string" },
+        { "internalType": "string", "name": "_ipfsHash", "type": "string" }
+      ],
+      "name": "registerArtwork",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+      "name": "signArtwork",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getArtworks",
+      "outputs": [
+        {
+          "components": [
+            { "internalType": "string", "name": "title", "type": "string" },
+            { "internalType": "string", "name": "artist", "type": "string" },
+            { "internalType": "string", "name": "description", "type": "string" },
+            { "internalType": "string", "name": "ipfsHash", "type": "string" },
+            { "internalType": "address[]", "name": "owners", "type": "address[]" },
+            { "internalType": "address[]", "name": "signers", "type": "address[]" }
+          ],
+          "internalType": "struct ZenArt.Artwork[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ];
 
   let provider, signer, contract;
 
