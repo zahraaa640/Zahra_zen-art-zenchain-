@@ -1,390 +1,493 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+
+<html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZenChain</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f8f9fa; }
-        .logo { max-width: 100px; margin: 10px auto; display: block; }
-        .container { max-width: 600px; margin-top: 20px; }
-        .btn-custom { background-color: #28a745; border: none; }
-        .btn-custom:hover { background-color: #218838; }
-        .gallery-item { margin-bottom: 20px; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px; background: white; }
-        .gallery-item img { max-width: 100%; height: auto; border-radius: 4px; }
-        #walletStatus { font-weight: bold; }
-        .connected { color: green; }
-        .disconnected { color: red; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ZenChain — ZenArt Frontend</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <style>
+    :root{--green:#3aa14a;--dark:#222;--muted:#666}
+    *{box-sizing:border-box}
+    body{font-family:Sahel, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#f6f6f6; color:var(--dark); margin:0; padding:0}
+    .container{max-width:720px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(15,15,15,0.06)}
+    header{text-align:center;margin-bottom:6px}
+    img.logo{max-width:120px;display:block;margin:14px auto}
+    h1{margin:8px 0;font-size:26px}
+    .status{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:12px}
+    .status .dot{width:18px;height:18px;border-radius:4px;display:inline-block}
+    .status.connected .dot{background:linear-gradient(90deg,#2ecc71,#27ae60)}
+    .status.disconnected .dot{background:#ccc}
+    .btn{background:var(--green);color:#fff;padding:12px 18px;border-radius:8px;border:0;cursor:pointer;font-weight:600;display:inline-block;min-width:160px}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    form{margin-top:18px}
+    label{display:block;font-weight:700;margin:14px 0 6px;text-align:right}
+    input[type=text], textarea{width:100%;padding:10px;border:1px solid #cfcfcf;border-radius:4px}
+    textarea{min-height:64px;resize:vertical}
+    .center{display:flex;justify-content:center}
+    .section-title{font-size:20px;margin-top:24px;margin-bottom:6px;text-align:center}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{border:1px solid #e6e6e6;padding:8px;text-align:center}
+    th{background:#fafafa}
+    .message{padding:10px;border-radius:6px;margin:10px 0}
+    .message.info{background:#e8f8ef;color:#1b5e20}
+    .message.error{background:#fdecea;color:#611517}
+    .message.warn{background:#fff4e5;color:#5a3a00}
+    footer{text-align:center;margin-top:18px;padding-top:12px;border-top:1px solid #eee}
+    .hero-img{max-width:100%;display:block;margin:18px auto;border-radius:8px}
+    @media (max-width:480px){.container{margin:8px;padding:12px}h1{font-size:20px}.btn{min-width:140px}}
+  </style>
 </head>
 <body>
-    <img src="IMG20251005132202_322.jpg" alt="ZenChain Logo" class="logo">
+  <div class="container">
+    <header>
+      <!-- use the exact logo path provided by user -->
+      <img class="logo" src="IMG20251005132202_322.jpg" alt="ZenChain Logo" />
+      <h1>Welcome to ZenChain</h1>
+    </header><div id="connectionArea" class="status disconnected">
+  <span class="dot"></span>
+  <div id="connText">Disconnected</div>
+</div>
 
-    <div class="container text-center">
-        <h2>Welcome to ZenChain</h2>
-        <p id="walletStatus" class="disconnected">Not connected</p>
-        <button id="addNetwork" class="btn btn-outline-primary me-2">Add ZenChain Testnet</button>
-        <button id="connectWallet" class="btn btn-custom btn-lg">Connect Wallet</button>
+<div class="center" style="margin-bottom:12px">
+  <button id="connectBtn" class="btn">Connect Wallet</button>
+</div>
 
-        <div id="registerSection" style="display: none;">
-            <h4>Register Artwork</h4>
-            <input type="text" id="artworkTitle" class="form-control mb-2" placeholder="Enter artwork title">
-            <input type="text" id="artistName" class="form-control mb-2" placeholder="Enter artist name">
-            <input type="text" id="description" class="form-control mb-2" placeholder="Enter description">
-            <input type="text" id="ipfsHash" class="form-control mb-2" placeholder="Enter IPFS hash (e.g., Qm...)">
-            <button id="registerArtwork" class="btn btn-custom btn-lg">Register</button>
-        </div>
+<div id="messages"></div>
 
-        <div id="signSection" style="display: none;">
-            <h4>Sign Artwork</h4>
-            <input type="number" id="artworkIdToSign" class="form-control mb-2" placeholder="Enter artwork ID to sign">
-            <button id="signArtwork" class="btn btn-custom btn-lg">Sign</button>
-        </div>
+<form id="registerForm" onsubmit="return false;">
+  <label for="title">Artwork Title</label>
+  <input id="title" type="text" placeholder="Enter artwork title" />
 
-        <h4>Gallery</h4>
-        <div id="gallery"></div>
-    </div>
+  <label for="artist">Artist Name</label>
+  <input id="artist" type="text" placeholder="Enter artist name" />
 
-    <img src="IMG20251005132202_322.jpg" alt="ZenChain Logo" class="logo" style="margin-top: 20px;">
+  <label for="description">Description</label>
+  <textarea id="description" placeholder="Enter description"></textarea>
 
-    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.1/dist/ethers.min.js"></script>
-    <script>
-        let provider, signer, contract;
-        const contractAddress = "0xbd0806D765979C4e9078052aCAa7de3545a398FB";
-        const abi = [
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "uint256",
-                        "name": "artworkId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": false,
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "owner",
-                        "type": "address"
-                    }
-                ],
-                "name": "ArtworkRegistered",
-                "type": "event"
-            },
-            {
-                "anonymous": false,
-                "inputs": [
-                    {
-                        "indexed": true,
-                        "internalType": "uint256",
-                        "name": "artworkId",
-                        "type": "uint256"
-                    },
-                    {
-                        "indexed": true,
-                        "internalType": "address",
-                        "name": "signer",
-                        "type": "address"
-                    }
-                ],
-                "name": "ArtworkSigned",
-                "type": "event"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "string",
-                        "name": "_title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_artist",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_description",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "_ipfsHash",
-                        "type": "string"
-                    }
-                ],
-                "name": "registerArtwork",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "artworkId",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "signArtwork",
-                "outputs": [],
-                "stateMutability": "nonpayable",
-                "type": "function"
-            },
-            {
-                "inputs": [
-                    {
-                        "internalType": "uint256",
-                        "name": "",
-                        "type": "uint256"
-                    }
-                ],
-                "name": "artworks",
-                "outputs": [
-                    {
-                        "internalType": "string",
-                        "name": "title",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "artist",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "description",
-                        "type": "string"
-                    },
-                    {
-                        "internalType": "string",
-                        "name": "ipfsHash",
-                        "type": "string"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            },
-            {
-                "inputs": [],
-                "name": "getArtworks",
-                "outputs": [
-                    {
-                        "components": [
-                            {
-                                "internalType": "string",
-                                "name": "title",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "artist",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "description",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "string",
-                                "name": "ipfsHash",
-                                "type": "string"
-                            },
-                            {
-                                "internalType": "address[]",
-                                "name": "owners",
-                                "type": "address[]"
-                            },
-                            {
-                                "internalType": "address[]",
-                                "name": "signers",
-                                "type": "address[]"
-                            }
-                        ],
-                        "internalType": "struct ZenArt.Artwork[]",
-                        "name": "",
-                        "type": "tuple[]"
-                    }
-                ],
-                "stateMutability": "view",
-                "type": "function"
-            }
-        ];
+  <label for="ipfs">IPFS Hash</label>
+  <input id="ipfs" type="text" placeholder="Enter IPFS hash (e.g. Qm...)" />
 
-        // ZenChain Testnet Details (verified from official sources)
-        const chainId = 8408;
-        const rpcUrl = "https://testnet-rpc.zenchain.io";
-        const chainName = "ZenChain Testnet";
-        const currencySymbol = "ZTC";
-        const explorerUrl = "https://testnet-explorer.zenchain.io";
+  <div class="center" style="margin-top:10px">
+    <button id="registerBtn" class="btn">Register</button>
+  </div>
+</form>
 
-        async function addZenChainNetwork() {
-            if (window.ethereum) {
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_addEthereumChain',
-                        params: [{
-                            chainId: '0x20e8',  // Hex for 8408
-                            chainName: chainName,
-                            nativeCurrency: {
-                                name: 'ZenChain Token',
-                                symbol: currencySymbol,
-                                decimals: 18
-                            },
-                            rpcUrls: [rpcUrl],
-                            blockExplorerUrls: [explorerUrl]
-                        }]
-                    });
-                    alert('ZenChain Testnet added! Now connect your wallet.');
-                } catch (error) {
-                    alert('Failed to add network. Make sure MetaMask is open and try manually via chainlist.org/chain/8408');
-                    console.error(error);
-                }
-            } else {
-                alert('Please install MetaMask first!');
-            }
+<div class="section-title">Sign Artwork</div>
+<label for="signId">Artwork ID to Sign</label>
+<input id="signId" type="text" placeholder="Artwork ID to Sign" />
+<div class="center" style="margin-top:10px;margin-bottom:10px">
+  <button id="signBtn" class="btn">Sign</button>
+</div>
+
+<div class="section-title">Gallery</div>
+<div class="section-title" style="font-size:18px">Signature Table</div>
+<table id="galleryTable" aria-live="polite">
+  <thead>
+    <tr><th>ID</th><th>Title</th><th>Artist</th><th>IPFS / Preview</th><th>Owners</th><th>Signers</th></tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<!-- large logo picture at bottom similar to screenshot -->
+<img class="hero-img" src="IMG20251005132202_322.jpg" alt="ZenChain big" />
+
+<footer>
+  <small>ZenChain — ZenArt frontend</small>
+</footer>
+
+  </div>  <script>
+    // Contract address and ABI (exactly as provided)
+    const contractAddress = "0xbd0806D765979C4e9078052aCAa7de3545a398FB";
+    const contractABI = [
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "artworkId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"name": "ArtworkRegistered",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "artworkId",
+				"type": "uint256"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "signer",
+				"type": "address"
+			}
+		],
+		"name": "ArtworkSigned",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_artist",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_description",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_ipfsHash",
+				"type": "string"
+			}
+		],
+		"name": "registerArtwork",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "artworkId",
+				"type": "uint256"
+			}
+		],
+		"name": "signArtwork",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "artworks",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "title",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "artist",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "description",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "ipfsHash",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getArtworks",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "title",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "artist",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "description",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "ipfsHash",
+						"type": "string"
+					},
+					{
+						"internalType": "address[]",
+						"name": "owners",
+						"type": "address[]"
+					},
+					{
+						"internalType": "address[]",
+						"name": "signers",
+						"type": "address[]"
+					}
+				],
+				"internalType": "struct ZenArt.Artwork[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+
+    // DOM elements
+    const connectBtn = document.getElementById('connectBtn');
+    const connText = document.getElementById('connText');
+    const connectionArea = document.getElementById('connectionArea');
+    const messages = document.getElementById('messages');
+    const registerBtn = document.getElementById('registerBtn');
+    const signBtn = document.getElementById('signBtn');
+    const galleryTableBody = document.querySelector('#galleryTable tbody');
+
+    let provider;
+    let signer;
+    let contract;
+    let currentAddress = null;
+    let connected = false;
+
+    function showMessage(text, type='info', timeout=7000){
+      const div = document.createElement('div');
+      div.className = 'message ' + (type==='error' ? 'error' : (type==='warn' ? 'warn' : 'info'));
+      div.innerText = text;
+      messages.prepend(div);
+      if(timeout) setTimeout(()=>{div.remove()}, timeout);
+    }
+
+    function short(address){ if(!address) return ''; return address.slice(0,6)+"..."+address.slice(-4)}
+
+    async function connectWallet(){
+      if(typeof window.ethereum === 'undefined'){
+        showMessage('کیف پول (مثل MetaMask) پیدا نشد. لطفاً افزونهٔ MetaMask را نصب کنید یا کیف پول سازگار را فعال کنید.', 'error', 10000);
+        return;
+      }
+      try{
+        provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+        // request accounts
+        await provider.send('eth_requestAccounts', []);
+        signer = provider.getSigner();
+        currentAddress = await signer.getAddress();
+        contract = new ethers.Contract(contractAddress, contractABI, provider);
+
+        connected = true;
+        updateConnectionUI();
+
+        // use contract with signer for write actions
+        contract = contract.connect(signer);
+
+        // set up listeners for events (only after provider ready)
+        subscribeToEvents();
+
+        // initial load of gallery
+        await loadGallery();
+
+        showMessage('Wallet connected: ' + short(currentAddress), 'info', 4000);
+      }catch(err){
+        console.error(err);
+        showMessage('اتصال با خطا مواجه شد. لطفاً بررسی کنید که دسترسی کیف پول را تأیید کرده‌اید و شبکهٔ فعال با قرارداد مطابقت دارد.', 'error', 8000);
+      }
+    }
+
+    function updateConnectionUI(){
+      if(connected){
+        connectionArea.classList.remove('disconnected');
+        connectionArea.classList.add('connected');
+        connText.innerText = 'Connected: ' + currentAddress;
+        connectBtn.innerText = 'Wallet Connected';
+        connectBtn.disabled = true;
+      } else {
+        connectionArea.classList.add('disconnected');
+        connectionArea.classList.remove('connected');
+        connText.innerText = 'Disconnected';
+        connectBtn.innerText = 'Connect Wallet';
+        connectBtn.disabled = false;
+      }
+    }
+
+    connectBtn.addEventListener('click', async ()=>{
+      if(!connected) await connectWallet();
+    });
+
+    // form validations
+    function validateRegisterInputs(title, artist, desc, ipfs){
+      if(!title || title.trim().length<1) return 'عنوان اثر نباید خالی باشد.';
+      if(!artist || artist.trim().length<1) return 'نام هنرمند نباید خالی باشد.';
+      if(!desc || desc.trim().length<3) return 'توضیحات باید حداقل 3 کاراکتر باشد.';
+      if(!ipfs || ipfs.trim().length<4) return 'IPFS hash وارد نشده.';
+      // basic IPFS CID check (very permissive)
+      if(!/^Qm[1-9A-Za-z]{44,}|^[a-zA-Z0-9_-]{20,}$/m.test(ipfs.trim())){
+        // we'll not block uncommon CIDs, only warn
+        // but require at least non-empty
+      }
+      return null;
+    }
+
+    registerBtn.addEventListener('click', async ()=>{
+      if(!connected) { showMessage('ابتدا کیف پول را وصل کنید تا بتوانید اثر ثبت کنید.', 'warn'); return; }
+      const title = document.getElementById('title').value.trim();
+      const artist = document.getElementById('artist').value.trim();
+      const description = document.getElementById('description').value.trim();
+      const ipfs = document.getElementById('ipfs').value.trim();
+
+      const invalid = validateRegisterInputs(title, artist, description, ipfs);
+      if(invalid){ showMessage(invalid, 'error'); return; }
+
+      try{
+        registerBtn.disabled = true;
+        showMessage('در حال ارسال تراکنش ثبت اثر... لطفاً کیف پول را تأیید کنید.', 'info', 8000);
+        const tx = await contract.registerArtwork(title, artist, description, ipfs);
+        showMessage('تراکنش فرستاده شد، منتظر تأیید شبکه...', 'info');
+        await tx.wait();
+        showMessage('اثر با موفقیت ثبت شد. گالری به‌روزرسانی می‌شود.', 'info');
+        await loadGallery();
+      }catch(err){
+        console.error(err);
+        // user-friendly error handling
+        const msg = parseEthError(err);
+        showMessage('ثبت اثر ناموفق بود: ' + msg, 'error', 9000);
+      }finally{ registerBtn.disabled = false; }
+    });
+
+    signBtn.addEventListener('click', async ()=>{
+      if(!connected) { showMessage('ابتدا کیف پول را وصل کنید تا بتوانید امضا کنید.', 'warn'); return; }
+      const idRaw = document.getElementById('signId').value.trim();
+      if(!idRaw || isNaN(Number(idRaw))){ showMessage('لطفاً یک شناسهٔ عددی صحیح برای امضا وارد کنید.', 'error'); return; }
+      const artworkId = Number(idRaw);
+      try{
+        // get artworks to check signers
+        const arts = await contract.getArtworks();
+        if(artworkId < 0 || artworkId >= arts.length){ showMessage('شناسهٔ واردشده معتبر نیست (خارج از محدوده).', 'error'); return; }
+        const target = arts[artworkId];
+        const signers = target.signers || [];
+        const normalizedSigners = signers.map(a => a.toLowerCase());
+        if(normalizedSigners.includes(currentAddress.toLowerCase())){
+          showMessage('شما قبلاً این اثر را امضا کرده‌اید.', 'warn');
+          return;
         }
 
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    // Check if on correct chain
-                    const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
-                    if (parseInt(currentChainId, 16) !== chainId) {
-                        alert(`Please switch to ZenChain Testnet (Chain ID: ${chainId}). Use the "Add Network" button if needed.`);
-                        return;
-                    }
+        signBtn.disabled = true;
+        showMessage('در حال ارسال تراکنش امضا... لطفاً کیف پول را تأیید کنید.', 'info', 8000);
+        const tx = await contract.signArtwork(artworkId);
+        await tx.wait();
+        showMessage('امضا با موفقیت ثبت شد. گالری به‌روزرسانی می‌شود.', 'info');
+        await loadGallery();
+      }catch(err){
+        console.error(err);
+        const msg = parseEthError(err);
+        showMessage('امضا ناموفق بود: ' + msg, 'error', 9000);
+      }finally{ signBtn.disabled = false; }
+    });
 
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    provider = new ethers.BrowserProvider(window.ethereum);
-                    signer = await provider.getSigner();
-                    contract = new ethers.Contract(contractAddress, abi, signer);
-
-                    document.getElementById("walletStatus").innerHTML = `Connected: ${signer.address.slice(0,6)}...${signer.address.slice(-4)}`;
-                    document.getElementById("walletStatus").className = "connected";
-                    document.getElementById("connectWallet").disabled = true;
-                    document.getElementById("registerSection").style.display = "block";
-                    document.getElementById("signSection").style.display = "block";
-                    loadGallery();
-                } catch (error) {
-                    alert('Connection failed: ' + (error.message || 'Please try again. Make sure MetaMask is unlocked.'));
-                    console.error(error);
-                }
-            } else {
-                alert('Please install a wallet like MetaMask!');
-            }
+    async function loadGallery(){
+      if(!connected) return; // safeguard: do nothing when wallet not connected
+      try{
+        galleryTableBody.innerHTML = '';
+        const arts = await contract.getArtworks();
+        if(!arts || arts.length === 0){
+          const tr = document.createElement('tr');
+          tr.innerHTML = '<td colspan="6">گالری خالی است.</td>';
+          galleryTableBody.appendChild(tr);
+          return;
         }
-
-        async function registerArtwork() {
-            if (!contract) return alert("Please connect your wallet first.");
-            const title = document.getElementById("artworkTitle").value.trim();
-            const artist = document.getElementById("artistName").value.trim();
-            const desc = document.getElementById("description").value.trim();
-            const ipfs = document.getElementById("ipfsHash").value.trim();
-
-            if (!title || !artist || !desc || !ipfs) {
-                return alert("Please fill in all fields. Titles and descriptions can't be empty.");
-            }
-            if (title.length < 1 || artist.length < 1 || desc.length < 10 || ipfs.length < 5) {
-                return alert("Please make sure title/artist are at least 1 char, description 10+ chars, and IPFS hash is valid (starts with Qm...).");
-            }
-
-            try {
-                const tx = await contract.registerArtwork(title, artist, desc, ipfs);
-                alert("Transaction sent! Waiting for confirmation...");
-                await tx.wait();
-                alert("Artwork registered successfully! Check the gallery.");
-                loadGallery();
-                clearRegisterInputs();
-            } catch (error) {
-                let msg = "Registration failed. ";
-                if (error.reason) msg += error.reason;
-                else if (error.message.includes("reverted")) msg += "Invalid inputs or network issue. Check IPFS hash and try again.";
-                else msg += error.message;
-                alert(msg);
-                console.error(error);
-            }
+        for(let i=0;i<arts.length;i++){
+          const a = arts[i];
+          const tr = document.createElement('tr');
+          const ipfsHash = a.ipfsHash || '';
+          const ipfsPreview = ipfsHash ? `<a href="https://ipfs.io/ipfs/${ipfsHash}" target="_blank">${ipfsHash}</a>` : '—';
+          const owners = (a.owners || []).map(o => short(o)).join(', ') || '—';
+          const signers = (a.signers || []).map(s => short(s)).join(', ') || '—';
+          tr.innerHTML = `<td>${i}</td><td>${escapeHtml(a.title || '')}</td><td>${escapeHtml(a.artist || '')}</td><td>${ipfsPreview}</td><td>${owners}</td><td>${signers}</td>`;
+          galleryTableBody.appendChild(tr);
         }
+      }catch(err){
+        console.error(err);
+        showMessage('خطا در خواندن گالری از قرارداد. احتمالاً مشکل شبکه یا سازگاری ABI وجود دارد.', 'error', 9000);
+      }
+    }
 
-        async function signArtwork() {
-            if (!contract) return alert("Please connect your wallet first.");
-            const id = parseInt(document.getElementById("artworkIdToSign").value);
-            if (!id || id < 0) return alert("Please enter a valid artwork ID (number >= 0).");
+    function escapeHtml(s){ if(!s) return ''; return s.replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
 
-            try {
-                const tx = await contract.signArtwork(id);
-                alert("Transaction sent! Waiting for confirmation...");
-                await tx.wait();
-                alert("Artwork signed successfully! Check the gallery.");
-                loadGallery();
-                document.getElementById("artworkIdToSign").value = "";
-            } catch (error) {
-                let msg = "Signing failed. ";
-                if (error.reason) msg += error.reason;
-                else if (error.message.includes("already signed")) msg += "You have already signed this artwork.";
-                else if (error.message.includes("reverted")) msg += "Artwork doesn't exist or invalid ID.";
-                else msg += error.message;
-                alert(msg);
-                console.error(error);
-            }
+    function parseEthError(err){
+      // Friendly parsing — never show raw internal errors to user
+      try{
+        if(!err) return 'خطای نامشخص.';
+        const message = err.message || JSON.stringify(err);
+        if(message.includes('User rejected transaction')) return 'تراکنش توسط کاربر رد شد.';
+        if(message.includes('insufficient funds')) return 'مقدار ETH/بِنانس کافی برای پرداخت گس موجود نیست.';
+        if(message.includes('execution reverted')) return 'قرارداد تراکنش را بازگرداند (پارامترها یا شرایط قرارداد ممکن است نامعتبر باشند).';
+        if(message.includes('internal JSON-RPC error') || message.includes('internal error')) return 'خطای داخلی شبکه یا نود. دوباره تلاش کنید یا نود دیگری انتخاب کنید.';
+        // fallback: short message
+        return message.split('\n')[0];
+      }catch(e){ return 'خطای نامشخص.'; }
+    }
+
+    function subscribeToEvents(){
+      if(!contract || !contract.on) return;
+      // remove previous listeners to avoid duplication
+      try{ contract.removeAllListeners('ArtworkRegistered'); } catch(e){}
+      try{ contract.removeAllListeners('ArtworkSigned'); } catch(e){}
+
+      contract.on('ArtworkRegistered', async (artworkId, title, owner) => {
+        showMessage(`رویداد: اثر ثبت شد — ID: ${artworkId.toString()}, Title: ${title}`, 'info', 6000);
+        await loadGallery();
+      });
+
+      contract.on('ArtworkSigned', async (artworkId, signerAddr) => {
+        showMessage(`رویداد: اثر امضا شد — ID: ${artworkId.toString()}, signer: ${short(signerAddr)}`, 'info', 6000);
+        await loadGallery();
+      });
+    }
+
+    // ensure we don't automatically call contract functions unless wallet connected
+    // listen to account changes
+    if(window.ethereum){
+      window.ethereum.on('accountsChanged', async (accounts) => {
+        if(accounts.length === 0){
+          connected = false; currentAddress = null; updateConnectionUI(); showMessage('حساب قطع شد.', 'warn');
+        } else {
+          currentAddress = accounts[0]; connected = true; signer = provider ? provider.getSigner() : null; updateConnectionUI(); await loadGallery();
         }
+      });
+      window.ethereum.on('chainChanged', (chainId) => {
+        // do not auto-call any write functions, but update UI
+        showMessage('شبکه تغییر کرد، لطفاً مطمئن شوید شبکهٔ کیف پول با قرارداد مطابقت دارد.', 'warn');
+      });
+    }
 
-        async function loadGallery() {
-            if (!provider) return;
-            try {
-                const artworks = await contract.getArtworks();
-                const galleryDiv = document.getElementById("gallery");
-                galleryDiv.innerHTML = "";
-                if (artworks.length === 0) {
-                    galleryDiv.innerHTML = "<p>No artworks yet. Register one to start!</p>";
-                    return;
-                }
-                artworks.forEach((artwork, index) => {
-                    const item = document.createElement("div");
-                    item.className = "gallery-item";
-                    const imgSrc = artwork[3] ? `https://ipfs.io/ipfs/${artwork[3]}` : '';  // ipfsHash is index 3 in tuple
-                    item.innerHTML = `
-                        <h5>ID: ${index}</h5>
-                        <h6>${artwork[0]} by ${artwork[1]}</h6>  <!-- title, artist -->
-                        <p>${artwork[2]}</p>  <!-- description -->
-                        ${imgSrc ? `<img src="${imgSrc}" alt="Artwork" onerror="this.style.display='none'">` : '<p>No image available</p>'}
-                        <p><strong>Owners:</strong> ${artwork[4].join(', ') || 'None'}</p>  <!-- owners -->
-                        <p><strong>Signers:</strong> ${artwork[5].join(', ') || 'None'}</p>  <!-- signers -->
-                    `;
-                    galleryDiv.appendChild(item);
-                });
-            } catch (error) {
-                console.error("Gallery load error:", error);
-                document.getElementById("gallery").innerHTML = "<p>Failed to load gallery. Try refreshing after connecting.</p>";
-            }
-        }
-
-        function clearRegisterInputs() {
-            document.getElementById("artworkTitle").value = "";
-            document.getElementById("artistName").value = "";
-            document.getElementById("description").value = "";
-            document.getElementById("ipfsHash").value = "";
-        }
-
-        // Event Listeners
-        document.getElementById("addNetwork").addEventListener("click", addZenChainNetwork);
-        document.getElementById("connectWallet").addEventListener("click", connectWallet);
-        document.getElementById("registerArtwork").addEventListener("click", registerArtwork);
-        document.getElementById("signArtwork").addEventListener("click", signArtwork);
-
-        // Auto-check connection on load
-        if (window.ethereum) {
-            window.ethereum.on('chainChanged', () => location.reload());
-            window.ethereum.on('accountsChanged', () => location.reload());
-        }
-    </script>
-</body>
+  </script></body>
 </html>
