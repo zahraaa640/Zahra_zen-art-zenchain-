@@ -10,6 +10,7 @@
       text-align: center;
       margin: 0;
       padding: 0;
+      background-color: #f5f5f5;
     }
     .logo-small {
       max-width: 120px;
@@ -21,11 +22,29 @@
       object-fit: cover;
       margin-top: 100px;
     }
+    h1 {
+      color: #333;
+      margin-top: 10px;
+    }
     input, button {
       margin: 8px;
       padding: 8px;
       width: 80%;
       max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #walletStatus {
+      color: green;
+      font-weight: bold;
     }
     table {
       margin: 20px auto;
@@ -35,6 +54,10 @@
     th, td {
       border: 1px solid #ccc;
       padding: 6px;
+    }
+    #gallery img {
+      max-width: 200px;
+      margin: 10px;
     }
   </style>
 </head>
@@ -255,11 +278,16 @@
     let provider, signer, contract;
 
     async function connectWallet() {
-      if (!window.ethereum) return alert("Please install MetaMask.");
+      if (!window.ethereum) {
+        alert("MetaMask not detected.");
+        return;
+      }
+
       provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
       signer = provider.getSigner();
       contract = new ethers.Contract(contractAddress, abi, signer);
+
       const address = await signer.getAddress();
       document.getElementById("walletStatus").innerText = `✅ Connected: ${address}`;
       loadArtworks();
@@ -319,8 +347,6 @@
           const img = document.createElement("img");
           img.src = `https://ipfs.io/ipfs/${art.imageHash}`;
           img.alt = art.artistName;
-          img.style.maxWidth = "200px";
-          img.style.margin = "10px";
           gallery.appendChild(img);
         }
       } catch (err) {
