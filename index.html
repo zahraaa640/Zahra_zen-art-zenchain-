@@ -6,57 +6,91 @@
   <title>ZenArt</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    body { font-family: sans-serif; background: linear-gradient(to bottom right, #e0f7fa, #f1f8e9); padding: 20px; text-align: center; }
-    input, button { margin: 10px auto; padding: 10px; width: 90%; max-width: 400px; display: block; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; }
-    button { background: #007bff; color: white; font-weight: bold; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    h1, h2 { color: #333; }
-    table { margin: 20px auto; border-collapse: collapse; width: 90%; max-width: 600px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    #gallery img { max-width: 100%; margin-top: 10px; border-radius: 8px; }
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+    }
+    h1 {
+      color: #4CAF50;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      border: 1px solid #4CAF50;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #388E3C;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    #gallery img {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
 
-<img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo" style="max-width:120px;" />
-<h1>ZenArt</h1>
-<p id="walletStatus">Wallet not connected</p>
-<button onclick="connectWallet()">Connect Wallet</button>
+  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" style="max-width:120px;" />
+  <h1>ZenArt</h1>
+  <p id="walletStatus">🔌 Wallet not connected</p>
+  <button onclick="connectWallet()">Connect Wallet</button>
 
-<h2>Register Artwork</h2>
-<input id="title" placeholder="Enter artwork title" />
-<input id="artist" placeholder="Enter artist name" />
-<input id="description" placeholder="Enter description" />
-<input id="ipfsHash" placeholder="Enter IPFS hash (e.g. Qm...)" />
-<button onclick="registerArtwork()">Register</button>
+  <h2>Register Artwork</h2>
+  <input id="title" placeholder="Artwork Title" />
+  <input id="artist" placeholder="Artist Name" />
+  <input id="description" placeholder="Description" />
+  <input id="imageHash" placeholder="IPFS Image Hash" />
+  <button onclick="registerArtwork()">Register</button>
 
-<h2>Sign Artwork</h2>
-<input id="artworkId" placeholder="Artwork ID to Sign" type="number" />
-<button onclick="signArtwork()">Sign</button>
+  <h2>Sign Artwork</h2>
+  <input id="signId" placeholder="Artwork ID to Sign" />
+  <button onclick="signArtwork()">Sign</button>
 
-<h2>Like Artwork</h2>
-<input id="likeId" placeholder="Artwork ID to Like" type="number" />
-<button onclick="likeArtwork()">Like</button>
+  <h2>Like Artwork</h2>
+  <input id="likeId" placeholder="Artwork ID to Like" />
+  <button onclick="likeArtwork()">Like</button>
 
-<h2>Signature Table</h2>
-<table id="signatureTable">
-  <thead>
-    <tr><th>ID</th><th>Title</th><th>Signatures</th><th>Likes</th></tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <h2>Signature Table</h2>
+  <table id="signatureTable">
+    <thead>
+      <tr><th>ID</th><th>Artist</th><th>Signatures</th><th>Likes</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<h2>Gallery</h2>
-<div id="gallery"></div>
+  <h2>Gallery</h2>
+  <div id="gallery"></div>
 
-<footer style="margin-top:40px;">
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" style="max-width:100px;" />
-  <p style="font-size:14px; color:#777;">© ZenArt 2025</p>
-</footer>
+  <footer style="margin-top:40px;">
+    <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo"
+         style="width:100%; max-height:300px; object-fit:cover;" />
+    <p style="font-size:14px; color:#777; margin-top:10px;">© ZenArt 2025</p>
+  </footer>
 
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
+let provider, signer, contract;
 const contractAddress = "0x570bFF83a22761F328D07c8D79Afe1F8e3b38F4D";
 const abi = [
   {
@@ -206,8 +240,6 @@ const abi = [
   }
 ];
 
-let provider, signer, contract;
-
 async function connectWallet() {
   if (!window.ethereum) return alert("Please install MetaMask.");
   provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -220,42 +252,37 @@ async function connectWallet() {
 }
 
 async function registerArtwork() {
-  const title = document.getElementById("title").value.trim();
-  const artist = document.getElementById("artist").value.trim();
-  const description = document.getElementById("description").value.trim();
-  const ipfsHash = document.getElementById("ipfsHash").value.trim();
-  if (!title || !artist || !description || !ipfsHash) return alert("Please fill in all fields.");
   try {
-    const tx = await contract.registerArtwork(ipfsHash, description, artist);
-    await tx.wait();
-    alert("✅ Artwork registered.");
+    const imageHash = document.getElementById("imageHash").value;
+    const description = document.getElementById("description").value;
+    const artistName = document.getElementById("artist").value;
+    await contract.registerArtwork(imageHash, description, artistName);
+    alert("Artwork registered!");
     loadArtworks();
   } catch (err) {
-    alert("❌ Error: " + (err.data?.message || err.message));
+    alert("Error: " + (err.data?.message || err.message));
   }
 }
 
 async function signArtwork() {
-  const id = document.getElementById("artworkId").value;
   try {
-    const tx = await contract.signArtwork(id);
-    await tx.wait();
-    alert("✅ Artwork signed.");
+    const id = document.getElementById("signId").value;
+    await contract.signArtwork(id);
+    alert("Artwork signed!");
     loadArtworks();
   } catch (err) {
-    alert("❌ Error: " + (err.data?.message || err.message));
+    alert("Error: " + (err.data?.message || err.message));
   }
 }
 
 async function likeArtwork() {
-  const id = document.getElementById("likeId").value;
   try {
-    const tx = await contract.likeArtwork(id);
-    await tx.wait();
-    alert("❤️ Artwork liked.");
+    const id = document.getElementById("likeId").value;
+    await contract.likeArtwork(id);
+    alert("Artwork liked!");
     loadArtworks();
   } catch (err) {
-    alert("❌ Error: " + (err.data?.message || err.message));
+    alert("Error: " + (err.data?.message || err.message));
   }
 }
 
@@ -269,6 +296,7 @@ async function loadArtworks() {
 
     for (let i = 0; i < nextId; i++) {
       const art = await contract.getArtwork(i);
+
       const row = document.createElement("tr");
       row.innerHTML = `<td>${i}</td><td>${art.artistName}</td><td>${art.signatures}</td><td>${art.likes}</td>`;
       tableBody.appendChild(row);
@@ -279,6 +307,6 @@ async function loadArtworks() {
       gallery.appendChild(img);
     }
   } catch (err) {
-    alert("❌ Failed to load artworks: " + (err.data?.message || err.message));
+    console.error("Error loading artworks:", err.data?.message || err.message);
   }
 }
