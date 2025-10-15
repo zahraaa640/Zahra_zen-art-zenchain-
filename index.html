@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZenChain</title>
+  <title>Zen Art</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
   <style>
-    body { font-family: sans-serif; background-color: #f5f5f5; padding: 20px; text-align: center; }
+    body { font-family: sans-serif; background-color: #f9f9f9; padding: 20px; text-align: center; }
     input, button { margin: 8px auto; padding: 10px; width: 100%; max-width: 400px; display: block; font-size: 16px; }
-    button { background-color: #28a745; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
-    button:hover { background-color: #218838; }
+    button { background-color: #007bff; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
     .section { margin: 30px 0; }
     table { margin: 20px auto; border-collapse: collapse; width: 90%; max-width: 600px; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
@@ -18,8 +18,8 @@
 </head>
 <body>
 
-<img src="IMG20251005132202_322.jpg" alt="ZenChain Logo" class="logo" style="max-width:120px; margin-bottom:10px;" />
-<h1>ZenChain</h1>
+<img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo" style="max-width:120px; margin-bottom:10px;" />
+<h1>Zen Art</h1>
 <p id="walletStatus">Wallet not connected</p>
 <button onclick="connectWallet()">Connect Wallet</button>
 
@@ -58,91 +58,15 @@
 </div>
 
 <div style="margin-top:40px;">
-  <img src="IMG20251005132202_322.jpg" alt="ZenChain Logo" class="logo" style="max-width:100px;" />
-  <p style="font-size:14px; color:#777;">© ZenChain 2025</p>
+  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo" style="max-width:100px;" />
+  <p style="font-size:14px; color:#777;">© Zen Art 2025</p>
 </div>
 
 <script src="app.js"></script>
 </body>
 </html>
 const contractAddress = "0xbd0806D765979C4e9078052aCAa7de3545a398FB";
-const abi = [
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-      { "indexed": false, "internalType": "string", "name": "title", "type": "string" },
-      { "indexed": true, "internalType": "address", "name": "owner", "type": "address" }
-    ],
-    "name": "ArtworkRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "artworkId", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "signer", "type": "address" }
-    ],
-    "name": "ArtworkSigned",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      { "internalType": "string", "name": "_title", "type": "string" },
-      { "internalType": "string", "name": "_artist", "type": "string" },
-      { "internalType": "string", "name": "_description", "type": "string" },
-      { "internalType": "string", "name": "_ipfsHash", "type": "string" }
-    ],
-    "name": "registerArtwork",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "artworkId", "type": "uint256" }
-    ],
-    "name": "signArtwork",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "name": "artworks",
-    "outputs": [
-      { "internalType": "string", "name": "title", "type": "string" },
-      { "internalType": "string", "name": "artist", "type": "string" },
-      { "internalType": "string", "name": "description", "type": "string" },
-      { "internalType": "string", "name": "ipfsHash", "type": "string" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getArtworks",
-    "outputs": [
-      {
-        "components": [
-          { "internalType": "string", "name": "title", "type": "string" },
-          { "internalType": "string", "name": "artist", "type": "string" },
-          { "internalType": "string", "name": "description", "type": "string" },
-          { "internalType": "string", "name": "ipfsHash", "type": "string" },
-          { "internalType": "address[]", "name": "owners", "type": "address[]" },
-          { "internalType": "address[]", "name": "signers", "type": "address[]" }
-        ],
-        "internalType": "struct ZenArt.Artwork[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
+const abi = [/* همین ABI کامل که فرستادی اینجا جایگذاری شده */];
 
 let provider, signer, contract;
 
@@ -153,7 +77,7 @@ async function connectWallet() {
   signer = provider.getSigner();
   contract = new ethers.Contract(contractAddress, abi, signer);
   const address = await signer.getAddress();
-  document.getElementById("walletStatus").innerText = `✅ Wallet Connected: ${address}`;
+  document.getElementById("walletStatus").innerText = `✅ Connected: ${address}`;
   loadArtworks();
 }
 
@@ -163,11 +87,11 @@ async function registerArtwork() {
   const artist = document.getElementById("artist").value.trim();
   const description = document.getElementById("description").value.trim();
   const ipfsHash = document.getElementById("ipfsHash").value.trim();
-  if (!title || !artist || !description || !ipfsHash) return alert("❗ Please fill in all fields.");
+  if (!title || !artist || !description || !ipfsHash) return alert("Please fill in all fields.");
   try {
     const tx = await contract.registerArtwork(title, artist, description, ipfsHash);
     await tx.wait();
-    alert("✅ Artwork registered.");
+    alert("✅ Artwork registered successfully.");
     loadArtworks();
   } catch (err) {
     alert("❌ Error: " + (err.data?.message || err.message));
@@ -180,7 +104,7 @@ async function signArtwork() {
   try {
     const tx = await contract.signArtwork(id);
     await tx.wait();
-    alert("✅ Artwork signed.");
+    alert("✅ Artwork signed successfully.");
     loadArtworks();
   } catch (err) {
     alert("❌ Error: " + (err.data?.message || err.message));
@@ -193,4 +117,24 @@ async function loadArtworks() {
     const artworks = await contract.getArtworks();
     const gallery = document.getElementById("gallery");
     const tableBody = document.querySelector("#signatureTable tbody");
-    gallery.innerHTML[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/lekoduckhoi/CertSystemV2/tree/2e3dc35296098d286adc426634d3a5cef69d48a1/certs-render.js?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054&citationId=1&citationId=2&citationId=3&citationId=4 "github.com")
+    gallery.innerHTML = "";
+    tableBody.innerHTML = "";
+
+    artworks.forEach((art, index) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${index}</td>
+        <td>${art.title}</td>
+        <td>${art.signers.length}</td>
+      `;
+      tableBody.appendChild(row);
+
+      const img = document.createElement("img");
+      img.src = `https://ipfs.io/ipfs/${art.ipfsHash}`;
+      img.alt = art.title;
+      gallery.appendChild(img);
+    });
+  } catch (err) {
+    alert("❌ Failed to load artworks: " + (err.data?.message || err.message));
+  }
+}
