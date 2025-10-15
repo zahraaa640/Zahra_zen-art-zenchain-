@@ -12,27 +12,23 @@
       margin: 0;
       padding: 0;
     }
-    .logo-small {
-      max-width: 120px;
-      margin-top: 20px;
-    }
-    .logo-large {
-      width: 100%;
-      max-height: 300px;
-      object-fit: cover;
-      margin-top: 100px;
-    }
     h1 {
+      margin-top: 20px;
       color: #333;
-      margin-top: 10px;
+    }
+    #walletStatus {
+      color: green;
+      font-weight: bold;
+      margin-bottom: 10px;
     }
     input, button {
-      margin: 8px;
-      padding: 8px;
+      margin: 6px;
+      padding: 10px;
       width: 80%;
       max-width: 400px;
       border: 1px solid #ccc;
       border-radius: 4px;
+      font-size: 16px;
     }
     button {
       background-color: #4CAF50;
@@ -42,9 +38,9 @@
     button:hover {
       background-color: #45a049;
     }
-    #walletStatus {
-      color: green;
-      font-weight: bold;
+    h2 {
+      margin-top: 30px;
+      color: #444;
     }
     table {
       margin: 20px auto;
@@ -53,7 +49,7 @@
     }
     th, td {
       border: 1px solid #ccc;
-      padding: 6px;
+      padding: 8px;
     }
     #gallery img {
       max-width: 200px;
@@ -63,33 +59,24 @@
 </head>
 <body>
 
-  <!-- Top Logo -->
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-small" />
-
-  <!-- Welcome Text -->
   <h1>Welcome to ZenChain</h1>
   <p id="walletStatus">🔌 Wallet not connected</p>
   <button onclick="connectWallet()">Connect Wallet</button>
 
-  <!-- Register Artwork -->
   <h2>Register Artwork</h2>
-  <input id="title" placeholder="Enter artwork title" />
-  <input id="artist" placeholder="Enter artist name" />
-  <input id="description" placeholder="Enter description" />
-  <input id="imageHash" placeholder="Enter IPFS hash (e.g. Qm...)" />
+  <input id="title" placeholder="Artwork Title" />
+  <input id="artist" placeholder="Artist Name" />
+  <input id="description" placeholder="Description" />
+  <input id="imageHash" placeholder="IPFS Hash (e.g. Qm...)" />
   <button onclick="registerArtwork()">Register</button>
 
-  <!-- Sign Artwork -->
   <h2>Sign Artwork</h2>
   <input id="signId" placeholder="Artwork ID to Sign" />
   <button onclick="signArtwork()">Sign</button>
 
-  <!-- Like Artwork -->
-  <h2>Like Artwork</h2>
-  <input id="likeId" placeholder="Artwork ID to Like" />
-  <button onclick="likeArtwork()">Like</button>
+  <h2>Gallery</h2>
+  <div id="gallery"></div>
 
-  <!-- Signature Table -->
   <h2>Signature Table</h2>
   <table id="signatureTable">
     <thead>
@@ -97,13 +84,6 @@
     </thead>
     <tbody></tbody>
   </table>
-
-  <!-- Gallery -->
-  <h2>Gallery</h2>
-  <div id="gallery"></div>
-
-  <!-- Bottom Logo -->
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" class="logo-large" />
 
   <script>
     const contractAddress = "0x358AA13c52544ECCEF6B0ADD0f801012ADAD5eE3";
@@ -218,29 +198,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_id", "type": "uint256" }
-    ],
-    "name": "getOwnershipHistory",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "liked",
-    "outputs": [
-      { "internalType": "bool", "name": "", "type": "bool" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "nextArtworkId",
     "outputs": [
@@ -248,111 +205,76 @@
     ],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "name": "ownershipHistory",
-    "outputs": [
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "signed",
-    "outputs": [
-      { "internalType": "bool", "name": "", "type": "bool" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   }
 ];
 
-    let provider, signer, contract;
+let provider, signer, contract;
 
-    async function connectWallet() {
-      if (!window.ethereum) {
-        alert("MetaMask not detected.");
-        return;
-      }
+async function connectWallet() {
+  if (!window.ethereum) {
+    alert("MetaMask not detected.");
+    return;
+  }
 
-      provider = new ethers.providers.Web3Provider(window.ethereum);
-      await provider.send("eth_requestAccounts", []);
-      signer = provider.getSigner();
-      contract = new ethers.Contract(contractAddress, abi, signer);
+  provider = new ethers.providers.Web3Provider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = provider.getSigner();
+  contract = new ethers.Contract(contractAddress, abi, signer);
 
-      const address = await signer.getAddress();
-      document.getElementById("walletStatus").innerText = `✅ Connected: ${address}`;
-      loadArtworks();
+  const address = await signer.getAddress();
+  document.getElementById("walletStatus").innerText = `✅ Connected: ${address}`;
+  loadArtworks();
+}
+
+async function registerArtwork() {
+  try {
+    const title = document.getElementById("title").value;
+    const artist = document.getElementById("artist").value;
+    const description = document.getElementById("description").value;
+    const imageHash = document.getElementById("imageHash").value;
+    await contract.registerArtwork(imageHash, description, artist);
+    alert("Artwork registered!");
+    loadArtworks();
+  } catch (err) {
+    alert("Error: " + (err.data?.message || err.message));
+  }
+}
+
+async function signArtwork() {
+  try {
+    const id = document.getElementById("signId").value;
+    await contract.signArtwork(id);
+    alert("Artwork signed!");
+    loadArtworks();
+  } catch (err) {
+    alert("Error: " + (err.data?.message || err.message));
+  }
+}
+
+async function loadArtworks() {
+  try {
+    const nextId = await contract.nextArtworkId();
+    const gallery = document.getElementById("gallery");
+    const tableBody = document.querySelector("#signatureTable tbody");
+    gallery.innerHTML = "";
+    tableBody.innerHTML = "";
+
+    for (let i = 0; i < nextId; i++) {
+      const art = await contract.getArtwork(i);
+
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${i}</td><td>${art.description}</td><td>${art.signatures}</td>`;
+      tableBody.appendChild(row);
+
+      const img = document.createElement("img");
+      img.src = `https://ipfs.io/ipfs/${art.imageHash}`;
+      img.alt = art.artistName;
+      gallery.appendChild(img);
     }
-
-    async function registerArtwork() {
-      try {
-        const title = document.getElementById("title").value;
-        const artist = document.getElementById("artist").value;
-        const description = document.getElementById("description").value;
-        const imageHash = document.getElementById("imageHash").value;
-        await contract.registerArtwork(imageHash, description, artist);
-        alert("Artwork registered!");
-        loadArtworks();
-      } catch (err) {
-        alert("Error: " + (err.data?.message || err.message));
-      }
-    }
-
-    async function signArtwork() {
-      try {
-        const id = document.getElementById("signId").value;
-        await contract.signArtwork(id);
-        alert("Artwork signed!");
-        loadArtworks();
-      } catch (err) {
-        alert("Error: " + (err.data?.message || err.message));
-      }
-    }
-
-    async function likeArtwork() {
-      try {
-        const id = document.getElementById("likeId").value;
-        await contract.likeArtwork(id);
-        alert("Artwork liked!");
-        loadArtworks();
-      } catch (err) {
-        alert("Error: " + (err.data?.message || err.message));
-      }
-    }
-
-    async function loadArtworks() {
-      try {
-        const nextId = await contract.nextArtworkId();
-        const gallery = document.getElementById("gallery");
-        const tableBody = document.querySelector("#signatureTable tbody");
-        gallery.innerHTML = "";
-        tableBody.innerHTML = "";
-
-        for (let i = 0; i < nextId; i++) {
-          const art = await contract.getArtwork(i);
-
-          const row = document.createElement("tr");
-          row.innerHTML = `<td>${i}</td><td>${art.description}</td><td>${art.signatures}</td>`;
-          tableBody.appendChild(row);
-
-          const img = document.createElement("img");
-          img.src = `https://ipfs.io/ipfs/${art.imageHash}`;
-          img.alt = art.artistName;
-          gallery.appendChild(img);
-        }
-      } catch (err) {
-        console.error("Error loading artworks:", err.data?.message || err.message);
-      }
-    }
-  </script>
+  } catch (err) {
+    console.error("Error loading artworks:", err.data?.message || err.message);
+  }
+}
+</script>
 </body>
 </html>
