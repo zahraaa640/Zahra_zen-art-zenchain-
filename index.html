@@ -5,143 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ZenArt</title>
   <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
-  <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #f9f9f9;
-    }
-    h1 {
-      color: #4CAF50;
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 6px;
-      border: 1px solid #4CAF50;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      background: #4CAF50;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #388E3C;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    #gallery img {
-      max-width: 100%;
-      margin-top: 10px;
-      border-radius: 8px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo" style="max-width:120px;" />
-  <h1>ZenArt</h1>
+  <header>
+    <img src="images/IMG_20251005_132202_322.jpg" alt="ZenChain Logo" />
+    <h1>Welcome to ZenArt</h1>
+  </header>
+
   <p id="walletStatus">🔌 Wallet not connected</p>
   <button onclick="connectWallet()">Connect Wallet</button>
 
-  <h2>Register Artwork</h2>
-  <input id="title" placeholder="Artwork Title" />
-  <input id="artist" placeholder="Artist Name" />
-  <input id="description" placeholder="Description" />
-  <input id="imageHash" placeholder="IPFS Image Hash" />
-  <button onclick="registerArtwork()">Register</button>
+  <section>
+    <h2>Register Artwork</h2>
+    <input id="title" placeholder="Artwork Title" />
+    <input id="artist" placeholder="Artist Name" />
+    <input id="description" placeholder="Description" />
+    <input id="imageHash" placeholder="IPFS Image Hash" />
+    <button onclick="registerArtwork()">Register</button>
+  </section>
 
-  <h2>Sign Artwork</h2>
-  <input id="signId" placeholder="Artwork ID to Sign" />
-  <button onclick="signArtwork()">Sign</button>
+  <section>
+    <h2>Sign Artwork</h2>
+    <input id="signId" placeholder="Artwork ID to Sign" />
+    <button onclick="signArtwork()">Sign</button>
+  </section>
 
-  <h2>Like Artwork</h2>
-  <input id="likeId" placeholder="Artwork ID to Like" />
-  <button onclick="likeArtwork()">Like</button>
+  <section>
+    <h2>Like Artwork</h2>
+    <input id="likeId" placeholder="Artwork ID to Like" />
+    <button onclick="likeArtwork()">Like</button>
+  </section>
 
-  <h2>Signature Table</h2>
-  <table id="signatureTable">
-    <thead>
-      <tr><th>ID</th><th>Artist</th><th>Signatures</th><th>Likes</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <section>
+    <h2>Signature Table</h2>
+    <table id="signatureTable">
+      <thead>
+        <tr><th>ID</th><th>Artist</th><th>Signatures</th><th>Likes</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
-  <h2>Gallery</h2>
-  <div id="gallery"></div>
+  <section>
+    <h2>Gallery</h2>
+    <div id="gallery"></div>
+  </section>
 
-  <footer style="margin-top:40px;">
-    <img src="IMG_20251005_132202_322.jpg" alt="ZenChain Logo"
-         style="width:100%; max-height:300px; object-fit:cover;" />
-    <p style="font-size:14px; color:#777; margin-top:10px;">© ZenArt 2025</p>
+  <footer>
+    <img src="images/IMG_20251005_132202_322.jpg" alt="ZenChain Logo" />
+    <p>© ZenArt 2025</p>
   </footer>
 
   <script src="app.js"></script>
 </body>
 </html>
 let provider, signer, contract;
+
 const contractAddress = "0x570bFF83a22761F328D07c8D79Afe1F8e3b38F4D";
-const abi = [
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" }
-    ],
-    "name": "ArtworkLiked",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "artist", "type": "address" }
-    ],
-    "name": "ArtworkRegistered",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "user", "type": "address" }
-    ],
-    "name": "ArtworkSigned",
-    "type": "event"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_id", "type": "uint256" }],
-    "name": "likeArtwork",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      { "indexed": true, "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "to", "type": "address" }
-    ],
-    "name": "OwnershipTransferred",
-    "type": "event"
-  },
+[
   {
     "inputs": [
-      { "internalType": "string", "name": "_imageHash", "type": "string" },
-      { "internalType": "string", "name": "_description", "type": "string" },
-      { "internalType": "string", "name": "_artistName", "type": "string" }
+      { "internalType": "string", "name": "imageHash", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "artistName", "type": "string" }
     ],
     "name": "registerArtwork",
     "outputs": [],
@@ -149,65 +77,29 @@ const abi = [
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "_id", "type": "uint256" }],
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
     "name": "signArtwork",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_id", "type": "uint256" },
-      { "internalType": "address", "name": "_newOwner", "type": "address" }
-    ],
-    "name": "transferOwnership",
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
+    "name": "likeArtwork",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "name": "artworks",
-    "outputs": [
-      { "internalType": "uint256", "name": "id", "type": "uint256" },
-      { "internalType": "string", "name": "imageHash", "type": "string" },
-      { "internalType": "string", "name": "description", "type": "string" },
-      { "internalType": "string", "name": "artistName", "type": "string" },
-      { "internalType": "address", "name": "currentOwner", "type": "address" },
-      { "internalType": "uint256", "name": "likes", "type": "uint256" },
-      { "internalType": "uint256", "name": "signatures", "type": "uint256" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_id", "type": "uint256" }],
+    "inputs": [{ "internalType": "uint256", "name": "artworkId", "type": "uint256" }],
     "name": "getArtwork",
     "outputs": [
       { "internalType": "string", "name": "imageHash", "type": "string" },
       { "internalType": "string", "name": "description", "type": "string" },
       { "internalType": "string", "name": "artistName", "type": "string" },
-      { "internalType": "address", "name": "currentOwner", "type": "address" },
-      { "internalType": "uint256", "name": "likes", "type": "uint256" },
-      { "internalType": "uint256", "name": "signatures", "type": "uint256" }
+      { "internalType": "uint256", "name": "signatures", "type": "uint256" },
+      { "internalType": "uint256", "name": "likes", "type": "uint256" }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [{ "internalType": "uint256", "name": "_id", "type": "uint256" }],
-    "name": "getOwnershipHistory",
-    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "liked",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -217,28 +109,8 @@ const abi = [
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "uint256", "name": "", "type": "uint256" }
-    ],
-    "name": "ownershipHistory",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "", "type": "uint256" },
-      { "internalType": "address", "name": "", "type": "address" }
-    ],
-    "name": "signed",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
   }
-];
+]
 
 async function connectWallet() {
   if (!window.ethereum) return alert("Please install MetaMask.");
