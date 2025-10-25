@@ -66,42 +66,37 @@
       </div>
 
       <!-- Register -->
-      <div class="card" id="registerCard">
-        <h3>Register Artwork</h3>
-        <input id="imageHash" class="full-input" placeholder="Image / IPFS Hash (مثلاً Qm... یا URL)" />
-        <input id="title" class="full-input" placeholder="Artwork Title (اختیاری)" />
-        <input id="artistName" class="full-input" placeholder="Artist Name" />
-        <input id="description" class="full-input" placeholder="Description" />
-        <button id="registerBtn" class="full-btn">Register</button>
-        <div id="registerStatus" class="muted" style="margin-top:6px"></div>
-      </div>
+      <div id="registerCard">
+  <h3>Register Artwork</h3>
+  <input id="imageHash" class="full-input" placeholder="Image / IPFS Hash (e.g. Qm... or URL)" />
+  <input id="title" class="full-input" placeholder="Artwork Title" />
+  <input id="artistName" class="full-input" placeholder="Artist Name" />
+  <input id="description" class="full-input" placeholder="Description" />
+  <button id="registerBtn" class="full-btn">Register</button>
+  <div id="registerStatus" class="muted" style="margin-top:6px"></div>
+</div>
 
-      <!-- Actions -->
-      <div class="card" id="actionsCard">
-        <h3>Artwork Actions</h3>
-        <div class="mut
-        <input id="actionArtworkId" class="full-input" placeholder="Artwork ID (مثلاً 0)" />
-        <button id="likeBtn" class="full-btn">Like</button>
-        <button id="signBtn" class="full-btn">Sign</button>
+<div id="actionsCard">
+  <h3>Artwork Actions</h3>
+  <input id="actionArtworkId" class="full-input" placeholder="Artwork ID (e.g. 0)" />
+  <button id="likeBtn" class="full-btn">Like</button>
+  <button id="signBtn" class="full-btn">Sign</button>
 
-        <div style="margin-top:10px">
-          <h4 class="muted">Ownership History Lookup</h4>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <input id="historyId" class="full-input" placeholder="Artwork ID for history" style="flex:1" />
-            <button id="historyBtn" class="full-btn" style="width:auto; padding:10px 14px;">Show</button>
-          </div>
-          <pre id="historyOutput" class="muted" style="margin-top:8px; text-align:right; white-space:pre-wrap;"></pre>
-        </div>
-      </div>
+  <h4 style="margin-top:10px;">Ownership History Lookup</h4>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <input id="historyId" class="full-input" placeholder="Artwork ID for history" style="flex:1;" />
+    <button id="historyBtn" class="full-btn" style="width:auto; padding:10px 14px;">Show</button>
+  </div>
+  <pre id="historyOutput" class="muted" style="margin-top:8px; text-align:right; white-space:pre-wrap;"></pre>
+</div>
 
-      <!-- Gallery -->
-      <div class="card" id="galleryCard">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3>Gallery</h3>
-          <div class="muted">Loaded from contract</div>
-        </div>
-        <div id="galleryGrid"></div>
-      </div>
+<div id="galleryCard">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <h3>Gallery</h3>
+    <div class="muted">Loaded from contract</div>
+  </div>
+  <div id="galleryGrid"></div>
+</div>
 
       <!-- Chart -->
       <div class="card" id="chartCard">
