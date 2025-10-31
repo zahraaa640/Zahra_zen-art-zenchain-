@@ -1,41 +1,46 @@
-import React, { useState } from 'react';
-import { ethers } from 'ethers';
-import './style.css';
+// app.js
 
-function App() {
-  const [walletAddress, setWalletAddress] = useState('');
-  const [balance, setBalance] = useState('');
+document.addEventListener("DOMContentLoaded", () => {
+  const connectWalletButton = document.getElementById("connectWallet");
 
-  const connectWallet = async () => {
-    if (window.ethereum) {
-      try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const accounts = await provider.send("eth_requestAccounts", []);
-        const signer = await provider.getSigner();
-        const address = await signer.getAddress();
-        const balance = await provider.getBalance(address);
-        setWalletAddress(address);
-        setBalance(ethers.formatEther(balance));
-      } catch (error) {
-        console.error('Wallet connection failed:', error);
-      }
-    } else {
-      alert('MetaMask not found. Please install it.');
+  async function connectWallet() {
+    if (typeof window.ethereum === "undefined") {
+      alert("MetaMask not detected. Please install MetaMask.");
+      return;
     }
-  };
 
-  return (
-    <div className="zen-container">
-      <h1>ZenArt</h1>
-      <button onClick={connectWallet}>Connect Wallet</button>
-      {walletAddress && (
-        <>
-          <p>Your address: {walletAddress}</p>
-          <p>Your balance: {balance} ZETH</p>
-        </>
-      )}
-    </div>
-  );
-}
+    try {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+      const account = accounts[0];
 
-export default App;
+      // نمایش آدرس کوتاه‌شده روی دکمه
+      const shortAddress = `${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
+      connectWalletButton.innerText = shortAddress;
+      connectWalletButton.disabled = true;
+
+      console.log("Wallet connected:", account);
+    } catch (error) {
+      console.error("Wallet connection failed:", error);
+      alert("Connection failed. Please try again.");
+    }
+  }
+
+  connectWalletButton.addEventListener("click", connectWallet);
+
+  // چک کن اگر از قبل ولت وصله، خودش آدرس رو نشون بده
+  async function checkConnection() {
+    if (typeof window.ethereum !== "undefined") {
+      const accounts = await window.ethereum.request({ method: "eth_accounts" });
+      if (accounts.length > 0) {
+        const account = accounts[0];
+        const shortAddress = `${account.substring(0, 6)}...${account.substring(account.length - 4)}`;
+        connectWalletButton.innerText = shortAddress;
+        connectWalletButton.disabled = true;
+      }
+    }
+  }
+
+  checkConnection();
+});
